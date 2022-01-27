@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration Form</title>
+    <title>Login</title>
     <link rel="stylesheet" href="my_styles.css">
+
 </head>
 
 <body>
@@ -17,24 +18,21 @@
     </nav>
     <section class="logpanel">
         <div class="log">
-            <h2>Rejestracja nowego użytkownika</h2>
-            <form action="/login.html">
+            <h2>Zaloguj się</h2>
+            <form action="/main">
                 <div>
                     <p>
-                        <label for="name"></label>
-                        <input type="text" id="login" placeholder="Login" required>
-                    </p>
-                    <p>
                         <label for="email"></label>
-                        <input type="email" id="email" placeholder="Email" required>
+                        <input type="email" name="email" id="email" placeholder="Email" required>
                     </p>
                     <p>
                         <label for="password"></label>
-                        <input type="password" id="password" placeholder="Password" required>
+                        <input type="password" name="password" id="password" placeholder="Password" required>
                     </p>
-                    <button><a href="login.html">Rejestracja</a></button>
+                    <button><a href="main.html">Logowanie</a></button>
                 </div>
             </form>
+            <footer>Nie masz jeszcze konta? <a href="index.html">Zarejestruj się</a></footer>
         </div>
     </section>
 
