@@ -1,0 +1,136 @@
+body {
+    background-position:left;
+    background-size: auto;
+    background-image: url("https://images.wallpapersden.com/image/download/neon-gradient-minimalist_bGVlZmaUmZqaraWkpJRobWllrWdma2U.jpg");
+
+}
+
+h1 {
+    color: seagreen;
+    font-size: 1.5em;
+}
+
+h2 {
+    color: seagreen;
+    font-size: 1.3em;
+    margin-bottom: 0.3em;
+}
+
+section.logpanel {
+    display: flex;
+    justify-content: center;
+}
+.log {
+    border: 2px solid #005f73;
+    border-radius: 1em;
+    text-align: center;
+    background-color: rgba(51, 56, 80, 0.671);
+    padding: 10px;
+    min-width: 150px;  
+    max-width: 350px;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    flex-basis: 250px;
+    flex: 1 1;
+
+}
+
+input {
+    border: 2px solid black;
+    padding: 0.5em 1.5em;
+    border-radius: 1.5em;
+    min-width: 120px;
+    max-width: 200px;
+    align-items: center;
+    display: flex;
+    flex: 1 1;
+    justify-content: center;
+}
+
+.log button {
+    color:rgb(40, 95, 63);
+    background-color: rgb(206, 206, 206);
+    border-radius: 0.5em;
+}
+
+.log p {
+    display: flex;
+    justify-content: center;
+}
+
+a {
+    font-size: 20px;
+    font-weight: normal;
+    color: rgb(40, 95, 63);
+    font-family: fantasy;
+    padding: 2px;
+    text-decoration: none;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.5em;
+    font-weight: 700;
+    color:chocolate;
+    background-size: cover;
+    background-position: center;
+}
+
+nav div {
+    display: flex;
+    justify-content: center;
+}
+
+nav div:nth-of-type(1) {
+    flex-grow: 1;
+}
+
+nav div:nth-of-type(2) {
+    flex-shrink: 2;
+}
+
+a:hover {
+    color: #ccd5ae;
+}
+aside {
+    margin-top: 100px;
+    width: 250px;
+    height: auto;
+}
+.side p {
+    margin-top: 25px;
+}
+
+.side a {
+    width: 200px;
+    border: 2px solid;
+    border-left: 5px solid;
+    border-color: rgb(8, 58, 78); 
+    border-top-right-radius: 1em;
+    border-bottom-right-radius: 1em;
+    padding-inline-end: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    transition: margin-left 0.25s;
+    display: flex;
+    background-color: #6f9097;
+}
+
+.side a:hover {
+    border-left-color: blue;
+    background-color: #457b9d77;
+    margin-left: 5px;
+    box-shadow: -0.5em 0 0.5em -0.1em slateblue;
+}
+footer {
+    margin-top: 1em;
+    font-weight: 600;
+    color:seagreen;
+}
+footer a {
+    font-size: 1em;
+    
+    color:rgb(52, 165, 29)
+}
