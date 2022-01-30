@@ -1,8 +1,14 @@
 body {
-    background-position:left;
-    background-size: auto;
-    background-image: url("https://images.wallpapersden.com/image/download/neon-gradient-minimalist_bGVlZmaUmZqaraWkpJRobWllrWdma2U.jpg");
+    /* background-position:center; */
+    background-size: cover;
+    background-image: url("https://cdn.wallpapersafari.com/43/1/SMm9kn.jpg");
+    /* background-image: url("https://images.hdqwalls.com/wallpapers/graph-web-abstract-4k-hn.jpg"); */
+    /* background-image: url("https://images.wallpapersden.com/image/download/neon-gradient-minimalist_bGVlZmaUmZqaraWkpJRobWllrWdma2U.jpg"); */
+}
 
+main {
+    display: flex;
+    align-items: flex-end;
 }
 
 h1 {
@@ -20,6 +26,7 @@ section.logpanel {
     display: flex;
     justify-content: center;
 }
+
 .log {
     border: 2px solid #005f73;
     border-radius: 1em;
@@ -33,7 +40,25 @@ section.logpanel {
     flex-direction: column;
     flex-basis: 250px;
     flex: 1 1;
+}
 
+.budget_panel {
+    text-align: center;
+    /* background-color: rgba(51, 56, 80, 0.671); */
+    padding: 10px;
+
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    flex-basis: 250px;
+    flex: 1 1;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 input {
@@ -48,10 +73,11 @@ input {
     justify-content: center;
 }
 
-.log button {
+button {
     color:rgb(40, 95, 63);
     background-color: rgb(206, 206, 206);
     border-radius: 0.5em;
+    padding: 0.1em 0.5em;
 }
 
 .log p {
@@ -71,6 +97,7 @@ a {
 nav {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
     font-size: 1.5em;
     font-weight: 700;
     color:chocolate;
@@ -81,6 +108,7 @@ nav {
 nav div {
     display: flex;
     justify-content: center;
+    margin-right: 2em;
 }
 
 nav div:nth-of-type(1) {
@@ -124,6 +152,33 @@ aside {
     margin-left: 5px;
     box-shadow: -0.5em 0 0.5em -0.1em slateblue;
 }
+
+select {
+    border-radius: 1em;
+    height: 2em;
+    padding: 0 1.5em;
+}
+
+#expense_comment {
+    border-radius: 1.5em;
+    padding: 0.5em 1.5em;
+}
+
+input[type='date']::after {
+    content: attr(placeholder)
+  }
+
+button {
+    margin-top: 0.5em;
+    font-size: 1em;
+    border-radius: 1.5em;
+    background-color: #6f9097;
+}
+
+button:hover {
+    color: #ccd5ae;
+}
+
 footer {
     margin-top: 1em;
     font-weight: 600;
