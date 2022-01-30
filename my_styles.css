@@ -1,14 +1,11 @@
 body {
-    /* background-position:center; */
     background-size: cover;
     background-image: url("https://cdn.wallpapersafari.com/43/1/SMm9kn.jpg");
-    /* background-image: url("https://images.hdqwalls.com/wallpapers/graph-web-abstract-4k-hn.jpg"); */
-    /* background-image: url("https://images.wallpapersden.com/image/download/neon-gradient-minimalist_bGVlZmaUmZqaraWkpJRobWllrWdma2U.jpg"); */
 }
 
 main {
     display: flex;
-    align-items: flex-end;
+    align-items: flex-start;
 }
 
 h1 {
@@ -20,6 +17,55 @@ h2 {
     color: seagreen;
     font-size: 1.3em;
     margin-bottom: 0.3em;
+}
+
+p {
+    color: white;
+    font-size: 1em;
+}
+
+button {
+    color:rgb(40, 95, 63);
+    background-color: #6f9097;
+    margin-top: 0.5em;
+    font-size: 1em;
+    border-radius: 1.5em;
+    padding: 0.1em 0.5em;
+}
+
+button:hover {
+    color: #ccd5ae;
+}
+
+a {
+    font-size: 20px;
+    font-weight: normal;
+    color: rgb(40, 95, 63);
+    font-family: fantasy;
+    padding: 2px;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #ccd5ae;
+}
+
+input {
+    border: 2px solid black;
+    padding: 0.5em 1.5em;
+    border-radius: 1.5em;
+    min-width: 120px;
+    max-width: 200px;
+    align-items: center;
+    display: flex;
+    flex: 1 1;
+    justify-content: center;
+}
+
+select {
+    border-radius: 1em;
+    height: 2em;
+    padding: 0 1.5em;
 }
 
 section.logpanel {
@@ -42,56 +88,9 @@ section.logpanel {
     flex: 1 1;
 }
 
-.budget_panel {
-    text-align: center;
-    /* background-color: rgba(51, 56, 80, 0.671); */
-    padding: 10px;
-
-    align-items: center;
-    justify-content: center;
-    display: flex;
-    flex-direction: column;
-    flex-basis: 250px;
-    flex: 1 1;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-input {
-    border: 2px solid black;
-    padding: 0.5em 1.5em;
-    border-radius: 1.5em;
-    min-width: 120px;
-    max-width: 200px;
-    align-items: center;
-    display: flex;
-    flex: 1 1;
-    justify-content: center;
-}
-
-button {
-    color:rgb(40, 95, 63);
-    background-color: rgb(206, 206, 206);
-    border-radius: 0.5em;
-    padding: 0.1em 0.5em;
-}
-
 .log p {
     display: flex;
     justify-content: center;
-}
-
-a {
-    font-size: 20px;
-    font-weight: normal;
-    color: rgb(40, 95, 63);
-    font-family: fantasy;
-    padding: 2px;
-    text-decoration: none;
 }
 
 nav {
@@ -119,9 +118,6 @@ nav div:nth-of-type(2) {
     flex-shrink: 2;
 }
 
-a:hover {
-    color: #ccd5ae;
-}
 aside {
     margin-top: 100px;
     width: 250px;
@@ -153,10 +149,54 @@ aside {
     box-shadow: -0.5em 0 0.5em -0.1em slateblue;
 }
 
-select {
-    border-radius: 1em;
-    height: 2em;
-    padding: 0 1.5em;
+.budget_panel {
+    text-align: center;
+    padding: 10px;
+    height: 500px;
+    align-items: center;
+    align-content: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-basis: 250px;
+    flex: 1 1;
+}
+.balance_panel {
+    text-align: center;
+    padding: 10px;
+    height: auto;
+    align-items: center;
+    justify-self: flex-start;
+    display: flex;
+    flex-direction: column;
+    flex-basis: 250px;
+    flex: 1 1;
+}
+
+.show_balance {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    align-items: center;
+}
+
+.income_balance, .expense_balance {
+    margin-top: 5%;
+    width: 50%;
+    height: 90%;
+}
+
+.diagrams {
+    display: flex;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 #expense_comment {
@@ -164,28 +204,15 @@ select {
     padding: 0.5em 1.5em;
 }
 
-input[type='date']::after {
-    content: attr(placeholder)
-  }
-
-button {
-    margin-top: 0.5em;
-    font-size: 1em;
-    border-radius: 1.5em;
-    background-color: #6f9097;
-}
-
-button:hover {
-    color: #ccd5ae;
-}
-
 footer {
+    display: flex;
+    align-content:flex-end;
+    justify-content: center;
     margin-top: 1em;
     font-weight: 600;
     color:seagreen;
 }
 footer a {
     font-size: 1em;
-    
     color:rgb(52, 165, 29)
 }

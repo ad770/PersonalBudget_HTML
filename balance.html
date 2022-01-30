@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Budget</title>
+    <title>Balance</title>
     <link rel="stylesheet" href="my_styles.css">
 </head>
 
@@ -39,7 +39,30 @@
                 </p>
             </form>
         </aside>
-
+            <div class="balance_panel">
+                <div class="select_balance">
+                    <div class="balance_content">
+                        <select name="balance" id="time_option">
+                            <option value="current_month" selected>Bieżący miesiąc</option>
+                            <option value="recent_month">Poprzedni miesiąc</option>
+                            <option value="current_year">Bieżący rok</option>
+                            <option value="undenify">Niestandardowy</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="show_balance">
+                    <div class="expense_balance">
+                        <h2>Wykres wydatków</h2>
+                        <img src="https://joinup.ec.europa.eu/sites/default/files/styles/wysiwyg_half_width/public/inline-images/pie_chart.jpg?itok=fAz5Xd3z" alt="">
+                        <p>Przykładowy wykres kołowy</p>
+                    </div>
+                    <div class="income_balance">
+                        <h2>Wykres zarobków</h2>
+                        <img src="https://joinup.ec.europa.eu/sites/default/files/styles/wysiwyg_half_width/public/inline-images/pie_chart.jpg?itok=fAz5Xd3z" alt="">
+                        <p>Przykładowy wykres kołowy</p>
+                    </div>
+                </div>
+            </div>
     </main>
     <footer>2022 &#169; Adrian Żuchowski</footer>
 </body>
@@ -56,5 +79,4 @@
 
     document.getElementById('date').value = today;
     </script>
-
 </html>
