@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="my_styles.css">
 </head>
 
-<body>
+<body onload="">
     <nav>
         <div class="navigatebar">
             <h1>Witaj w świecie zarządzania Twoim budżetem osobistym!</h1>
@@ -39,61 +39,63 @@
                 </p>
             </form>
         </aside>
-            <div class="budget_panel">
-                <form action="main.html">
-                    <label for="expense"></label>
-                    <input type="text" name="expense" id="expense" placeholder="100,00 zł" required>
-                    <label for="expense_date"></label>
-                    <input type="date" name="date" id="date" required>
-                    <label for="expense_payment"></label>
-                    <select name="expense_payment" id="expense_payment">
-                        <option value="cash">Gotówka</option>
-                        <option value="debit">Karta debetowa</option>
-                        <option value="credit">Karta kredytowa</option>
-                    </select>
-                    <label for="expense_cat"></label>
-                    <select name="expense_cat" id="expense_cat">
-                        <option value="food">Jedzenie</option>
-                        <option value="accommodation">Mieszkanie</option>
-                        <option value="transport">Transport</option>
-                        <option value="telecommunication">Telekomunikacja</option>
-                        <option value="healthcare">Opieka zdrowotna</option>
-                        <option value="clothes">Ubranie</option>
-                        <option value="hygiene">Higiena</option>
-                        <option value="kids">Dzieci</option>
-                        <option value="entertainment">Rozrywka</option>
-                        <option value="trip">Wycieczka</option>
-                        <option value="training">Szkolenia</option>
-                        <option value="books">Książki</option>
-                        <option value="savings">Oszczędności</option>
-                        <option value="retiring">Na złotą jesień, czyli emeryturę</option>
-                        <option value="debt">Spłata długów</option>
-                        <option value="donation">Darowizna</option>
-                        <option value="other">Inne wydatki</option>
-                    </select>
-                    <label for="expense_comment"></label>
-                    <textarea name="expense_comment" cols="20" rows="5" id="expense_comment"
-                        placeholder="Uwagi (opcjonalnie)"></textarea>
-                    <div class="buttons">
-                        <button type="submit">Dodaj</button>
-                        <button type="submit" formnovalidate>Anuluj</button>
-                    </div>
-                </form>
-            </div>
+        <div class="budget_panel">
+            <form action="main.html">
+                <label for="expense"></label>
+                <input type="text" name="expense" id="expense" placeholder="100,00 zł" required>
+                <label for="input_date"></label>
+                <input type="date" name="input_date" id="input_date" required>
+                <label for="expense_payment"></label>
+                <select name="expense_payment" id="expense_payment">
+                    <option value="cash">Gotówka</option>
+                    <option value="debit">Karta debetowa</option>
+                    <option value="credit">Karta kredytowa</option>
+                </select>
+                <label for="expense_cat"></label>
+                <select name="expense_cat" id="expense_cat">
+                    <option value="food">Jedzenie</option>
+                    <option value="accommodation">Mieszkanie</option>
+                    <option value="transport">Transport</option>
+                    <option value="telecommunication">Telekomunikacja</option>
+                    <option value="healthcare">Opieka zdrowotna</option>
+                    <option value="clothes">Ubranie</option>
+                    <option value="hygiene">Higiena</option>
+                    <option value="kids">Dzieci</option>
+                    <option value="entertainment">Rozrywka</option>
+                    <option value="trip">Wycieczka</option>
+                    <option value="training">Szkolenia</option>
+                    <option value="books">Książki</option>
+                    <option value="savings">Oszczędności</option>
+                    <option value="retiring">Na złotą jesień, czyli emeryturę</option>
+                    <option value="debt">Spłata długów</option>
+                    <option value="donation">Darowizna</option>
+                    <option value="other">Inne wydatki</option>
+                </select>
+                <label for="expense_comment"></label>
+                <textarea name="expense_comment" cols="20" rows="5" id="expense_comment"
+                    placeholder="Uwagi (opcjonalnie)"></textarea>
+                <div class="buttons">
+                    <button type="submit">Dodaj</button>
+                    <button type="submit" formnovalidate>Anuluj</button>
+                </div>
+            </form>
+        </div>
     </main>
     <footer>2022 &#169; Adrian Żuchowski</footer>
-</body>
-<script>
-    var date = new Date();
-    var day = date.getDate();
-    var month = date.getMonth() + 1;
-    var year = date.getFullYear();
+    <script>
+        var date = new Date();
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
 
-    if (month < 10) month = "0" + month;
-    if (day < 10) day = "0" + day;
+        if (month < 10) month = "0" + month;
+        if (day < 10) day = "0" + day;
 
-    var today = year + "-" + month + "-" + day;
+        var today = year + "-" + month + "-" + day;
 
-    document.getElementById('date').value = today;
+        document.getElementById('input_date').value = today;
     </script>
+
+</body>
+
 </html>
