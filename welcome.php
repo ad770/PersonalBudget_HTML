@@ -2,109 +2,28 @@
 
 	session_start();
 	
-	if (isset($_POST['email']))
+	if (isset($_SESSION['udanarejestracja']))
 	{
-		//Udana walidacja
-		$is_good = true;
-		//Sprawdź poprawność nickname'a
-		$username = $_POST['username'];
-		
-		//Sprawdzenie długości nicka
-		if ((strlen($nick)<3) || (strlen($nick)>50))
-		{
-			$is_good = false;
-			$_SESSION['e_username'] = "Nick musi posiadać od 3 do 50 znaków!";
-		}
-		
-		//Sprawdź poprawność adresu email
-		$email=$_POST['email'];
-		$emailB = filter_var($email, FILTER_SANITIZE_EMAIL);
-		
-		if ((filter_var($emailB, FILTER_VALIDATE_EMAIL)==false) || ($emailB!=$email))
-		{
-			$is_good = false;
-			$_SESSION['e_email'] = "Podaj poprawny adres e-mail";
-		}
-		
-		//Sprawdź poprawność hasła
-		$password = $_POST['password'];
-		$check_password = $_POST['check_password'];
-		
-		if (strlen($password)<8)
-		{
-			$is_good = false;
-			$_SESSION['e_password']="Hasło musi posiadać conajmniej 8 znaków!";
-		}
-		
-		if ($password!=$check_password)
-		{
-			$is_good = false;
-			$_SESSION['e_password']="Podane hasła muszą być identyczne!";
-		}
-		
-		$password_hash = password_hash($password, PASSWORD_DEFAULT);
-		
-		//Zapamiętaj wprowdzone dane
-		$_SESSION['fr_username'] = $username;
-		$_SESSION['fr_email']= $email;
-		$_SESSION['fr_password'] = $password;
-		$_SESSION['fr_check_password'] = $check_password;
-		
-		require_once "connect.php";
-		mysqli_report(MYSQLI_REPORT_STRICT);
-		try
-		{
-			$connection = new mysqli($host, $db_user, $db_password, $db_name);
-				if ($connection->connect_errno!=0)
-			{
-				throw new Exception(mysqli_connect_errno());
-			}
-			else
-			{
-				//Czy email już istnieje?
-				$result = $connection->query("SELECT id FROM users WHERE email='$email'");
-				if (!$result) throw new Exception($connection->error);
-				
-				$emails_amount = $result->num_rows;
-				if ($emails_amount>0)
-				{
-					$is_good=false;
-					$_SESSION['e_email']="Istnieje już konto o takim adresie email";
-				}
-				//Czy nazwa użytkownika już istnieje?
-				$result = $connection->query("SELECT id FROM uzytkownicy WHERE username='$username'");
-				if (!$result) throw new Exception($connection->error);
-				
-				$nicks_amount = $result->num_rows;
-				if ($nicks_amount>0)
-				{
-					$is_good=false;
-					$_SESSION['e_nick']="Istnieje już gracz o takim nicku! Wybierz inny.";
-				}
-				
-				if($is_good==true)
-				{
-					//Wszystkie testy zaliczone, dodajemy gracza do bazy
-					if ($connection->query("INSERT INTO users VALUES (NULL, '$username', '$password_hash','$email')"))
-					{
-						$_SESSION['udanarejestracja']=true;
-						header('Location: index.php');
-					}
-					else
-					{
-						throw new Exception($connection->error);
-					}
-				}
-				$connection->close();
-			}
-		}
-		catch(Exception $e)
-		{
-				echo '<span style="color:red;">Błąd serwera! Przepraszamy za niedogodności i prosimy o rejestrację w innym terminie!</span>';
-				echo '<br/>Informacja developerska: '.$e;
-		}	
+		header('Location: index.php');
+		exit();
+	}
+	else
+	{
+		unset($_SESSION['udanarejestracja']);
 	}
 	
+	//Usuwanie zmiennych pamiętających wartości wpisane do formularza
+	
+	if (isset($_SESSION['fr_username'])) unset($_SESSION['fr_username']);
+	if (isset($_SESSION['fr_email'])) unset($_SESSION['fr_email']);
+	if (isset($_SESSION['fr_password'])) unset($_SESSION['fr_password']);
+	if (isset($_SESSION['fr_check_password'])) unset($_SESSION['fr_check_password']);
+	
+	//Usuwanie błędów rejestracji
+	if (isset($_SESSION['e_username'])) unset($_SESSION['e_username']);
+	if (isset($_SESSION['e_email'])) unset($_SESSION['e_email']);
+	if (isset($_SESSION['e_password'])) unset($_SESSION['e_password']);
+
 ?>
 
 <!DOCTYPE html>
@@ -124,17 +43,17 @@
 
 <body>
         <nav class="navbar navbar-dark bg-dark justify-content-center text-center p-3">
-                <a class="navbar-brand text-center" href="login.html"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-bank2" viewBox="0 0 1em 1em">
+                <a class="navbar-brand text-center" href="register.php"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-bank2" viewBox="0 0 1em 1em">
                     <path d="M8.277.084a.5.5 0 0 0-.554 0l-7.5 5A.5.5 0 0 0 .5 6h1.875v7H1.5a.5.5 0 0 0 0 1h13a.5.5 0 1 0 0-1h-.875V6H15.5a.5.5 0 0 0 .277-.916l-7.5-5zM12.375 6v7h-1.25V6h1.25zm-2.5 0v7h-1.25V6h1.25zm-2.5 0v7h-1.25V6h1.25zm-2.5 0v7h-1.25V6h1.25zM8 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM.5 15a.5.5 0 0 0 0 1h15a.5.5 0 1 0 0-1H.5z"/>
                   </svg> System zarządzania budżetem osobisym</a>
         </nav>
     <div class="container">
         <div class="row align-middle">
             <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 col-xxl-3 loginPanel p-1 pt-3 mb-3 mx-auto">
-                <form action="index.html">
+                <form action="register.php">
                     <div
                         class="row text-center justify-content-center border rounded-3 bg-success p-4 text-dark bg-opacity-10">
-                        <div class="col-12 text-center m-auto">
+                        <!-- <div class="col-12 text-center m-auto">
                             <div class="input-group my-3 mx-auto">
                                 <span class="input-group-text" id="basic-addon1"><svg xmlns="http://www.w3.org/2000/svg"
                                         width="16" height="16" fill="currentColor" class="bi bi-envelope"
@@ -150,7 +69,9 @@
 												unset($_SESSION['fr_username']);
 											}
 										?>"
-										<br/>
+										aria-label="Username"
+										aria-describedby="basic-addon1">
+									<br/>
 										<?php
 											if(isset($_SESSION['e_username']))
 											{
@@ -158,8 +79,6 @@
 												unset($_SESSION['e_username']);
 											}
 										?>
-										aria-label="Username"
-                                    aria-describedby="basic-addon1">
                             </div>                            <div class="input-group my-3 mx-auto">
                                 <span class="input-group-text" id="basic-addon1"><svg xmlns="http://www.w3.org/2000/svg"
                                         width="16" height="16" fill="currentColor" class="bi bi-envelope"
@@ -175,6 +94,8 @@
 												unset($_SESSION['fr_email']);
 											}
 										?>"
+										aria-label="Email"
+										aria-describedby="basic-addon1">
 										<br/>
 										<?php
 											if(isset($_SESSION['e_email']))
@@ -183,8 +104,6 @@
 												unset($_SESSION['e_email']);
 											}
 										?>
-										aria-label="Email"
-                                    aria-describedby="basic-addon1">
                             </div>
                             <div class="input-group mb-1 mx-auto">
                                 <span class="input-group-text" id="basic-addon1"><svg xmlns="http://www.w3.org/2000/svg"
@@ -200,8 +119,8 @@
                             <div class="input-group mb-3 w-50 mx-auto justify-content-center">
                                 <button type="submit" class="btn btn-primary mt-3 rounded-pill">Rejestracja</button>
                             </div>
-                        </div>
-                        <footer class="mb-1">Masz już konto? <a href="index.html">Zaloguj się</a></footer>
+                        </div> -->
+                        <footer class="mb-1">Aby przejść do strony <a href="index.php">logowania</a></footer>
                     </div>
             </div>
             </form>
