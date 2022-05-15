@@ -7,6 +7,35 @@
 		header('Location: index.php');
 		exit();
 	}
+	else
+	{
+		$user_id = $_SESSION['id'];
+		
+		require_once "connect.php";
+		mysqli_report(MYSQLI_REPORT_STRICT);
+		try
+		{
+			$connection = new mysqli($host, $db_user, $db_password, $db_name);
+			if ($connection->connect_errno!=0)
+			{
+				throw new Exception(mysqli_connect_errno());
+			}
+			else
+			{
+				$income_query = "SELECT * FROM incomes WHERE user_id='$user_id'";
+				$income_result = mysqli_query($connection, $income_query);
+				$expense_query = "SELECT * FROM expenses WHERE user_id='$user_id'";
+				$expense_result = mysqli_query($connection, $expense_query);
+				$connection->close();
+			}
+		}
+			catch(Exception $e)
+		{
+			echo '<span style="color:red;">Błąd serwera! Spróbuj ponownie za chwilę.</span>';
+			echo '<br/>Informacja developerska: '.$e;
+		}	
+
+	}
 	
 ?>
 
@@ -18,7 +47,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <!-- <link rel="stylesheet" href="my_styles.css"> -->
+    <link rel="stylesheet" href="my_styles.css">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
@@ -112,20 +141,86 @@
                 </div>
                 <div class="show_balance">
                     <div class="row text-center">
-                        <div class="col-10 col-md-4 mx-auto">
-                            <div class="expense_balance">
-                                <h2>Wykres wydatków</h2>
-                                <img src="https://joinup.ec.europa.eu/sites/default/files/styles/wysiwyg_half_width/public/inline-images/pie_chart.jpg?itok=fAz5Xd3z"
-                                class="img-fluid" alt="Expense_balance">
-                                <p>Przykładowy wykres kołowy</p>
+                        <div class="col-10 col-md-5 mx-auto">
+                            <div class="income_balance">
+									<?php
+									if ($income_result ->num_rows > 0) {
+											$connection = new mysqli($host, $db_user, $db_password, $db_name);
+											echo "<div class='h2'>Przychody</div>";
+											echo "<table class='table table-bordered table-striped'>";
+											echo "<thead>";
+											echo "<tr>";
+											echo "<th>Kategoria</th>";
+											echo "<th>Wartość PLN</th>";
+											echo "<th>Data</th>";
+											echo "<th>Komentarz</th>";
+											echo "</tr>";
+											echo "</thead>";
+										while ($income_row = mysqli_fetch_array($income_result)) 
+										{
+											echo "<tr>";
+											$income_category_id=$income_row['income_category_assigned_to_user_id'];
+											$income_category_query = "SELECT name FROM incomes_category_assigned_to_users WHERE id='$income_category_id'";
+											$income_category_result = mysqli_query($connection, $income_category_query);
+											$income_category_row = mysqli_fetch_array($income_category_result);
+											echo "<td>".$income_category_row['name']."</td>";
+											echo "<td>".$income_row['amount']."</td>";
+											echo "<td>".$income_row['date_of_income']."</td>";
+											echo "<td>".$income_row['income_comment']."</td>";
+											echo "</tr>";
+									   }
+											echo "</table>";
+											$connection->close();
+									}
+									else
+									{
+										echo "<div class='h3'>Brak przychodów</div>";
+									}
+								?>
                             </div>
                         </div>
-                        <div class="col-10 col-md-4 mx-auto">
-                            <div class="income_balance">
-                                <h2>Wykres zarobków</h2>
-                                <img src="https://joinup.ec.europa.eu/sites/default/files/styles/wysiwyg_half_width/public/inline-images/pie_chart.jpg?itok=fAz5Xd3z"
-                                class="img-fluid" alt="Income_balance">
-                                <p>Przykładowy wykres kołowy</p>
+                        <div class="col-10 col-md-6 mx-auto">
+                            <div class="expense_balance">
+								<?php
+									if ($expense_result ->num_rows > 0) {
+											$connection = new mysqli($host, $db_user, $db_password, $db_name);
+											echo "<div class='h2'>Wydatki</div>";
+											echo "<table class='table table-bordered table-striped'>";
+											echo "<thead>";
+											echo "<tr>";
+											echo "<th>Kategoria</th>";
+											echo "<th>Wartość PLN</th>";
+											echo "<th>Metoda</th>";
+											echo "<th>Data</th>";
+											echo "<th>Komentarz</th>";
+											echo "</tr>";
+											echo "</thead>";
+										while ($expense_row = mysqli_fetch_array($expense_result)) 
+										{
+											echo "<tr>";
+											$expense_category_id=$expense_row['expense_category_assigned_to_user_id'];
+											$expense_category_query = "SELECT name FROM expenses_category_assigned_to_users WHERE id='$expense_category_id'";
+											$expense_category_result = mysqli_query($connection, $expense_category_query);
+											$expense_category_row = mysqli_fetch_array($expense_category_result);
+											echo "<td>".$expense_category_row['name']."</td>";
+											echo "<td>".$expense_row['amount']."</td>";
+											$payment_method_id = $expense_row['payment_method_assigned_to_user_id'];
+											$payment_method_query = "SELECT name FROM payment_methods_assigned_to_users WHERE id='$payment_method_id'";
+											$payment_method_result = mysqli_query($connection, $payment_method_query);
+											$payment_method_row = mysqli_fetch_array($payment_method_result);
+											echo "<td>".$payment_method_row['name']."</td>";
+											echo "<td>".$expense_row['date_of_expense']."</td>";
+											echo "<td>".$expense_row['expense_comment']."</td>";
+											echo "</tr>";
+									   }
+											echo "</table>";
+											$connection->close();
+									}
+									else
+									{
+										echo "<div class='h3'>Brak wydatków</div>";
+									}
+								?>
                             </div>
                         </div>
                     </div>

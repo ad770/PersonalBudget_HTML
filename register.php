@@ -4,19 +4,15 @@
 	
 	if (isset($_POST['email']))
 	{
-		//Udana walidacja
 		$is_good = true;
-		//Sprawdź poprawność nickname'a
 		$username = $_POST['username'];
 		
-		//Sprawdzenie długości nicka
 		if ((strlen($username)<3) || (strlen($username)>50))
 		{
 			$is_good = false;
 			$_SESSION['e_username'] = "Nick musi posiadać od 3 do 50 znaków!";
 		}
 		
-		//Sprawdź poprawność adresu email
 		$email=$_POST['email'];
 		$emailB = filter_var($email, FILTER_SANITIZE_EMAIL);
 		
@@ -26,7 +22,6 @@
 			$_SESSION['e_email'] = "Podaj poprawny adres e-mail";
 		}
 		
-		//Sprawdź poprawność hasła
 		$password = $_POST['password'];
 		$check_password = $_POST['check_password'];
 		
@@ -44,7 +39,6 @@
 		
 		$password_hash = password_hash($password, PASSWORD_DEFAULT);
 		
-		//Zapamiętaj wprowdzone dane
 		$_SESSION['fr_username'] = $username;
 		$_SESSION['fr_email']= $email;
 		
@@ -59,7 +53,6 @@
 			}
 			else
 			{
-				//Czy email już istnieje?
 				$result = $connection->query("SELECT id FROM users WHERE email='$email'");
 				if (!$result) throw new Exception($connection->error);
 				
@@ -75,7 +68,8 @@
 					//Wszystkie testy zaliczone, dodajemy gracza do bazy
 					if ($connection->query("INSERT INTO users VALUES (NULL, '$username', '$password_hash','$email')"))
 					{
-						$_SESSION['udanarejestracja']=true;
+						$_SESSION['email']=$email;
+						$_SESSION['successful_registration']=true;
 						header('Location: welcome.php');
 					}
 					else

@@ -7,7 +7,6 @@
 		header('Location: index.php');
 		exit();
 	}
-	
 ?>
 
 <!DOCTYPE html>
@@ -98,29 +97,6 @@
             </div>
         </div>
 
-        <div class="row mt-5 justify-content-center text-center">
-            <div class="col-12 col-sm-3  display-5">
-                <a href="income.php"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
-                        fill="currentColor" class="bi bi-graph-up-arrow" viewBox="0 0 1em 1em">
-                        <path fill-rule="evenodd"
-                            d="M0 0h1v15h15v1H0V0Zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5Z" />
-                    </svg> Income</a>
-            </div>
-            <div class="col-12 col-sm-3  display-5">
-                <a href="expense.php"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
-                        fill="currentColor" class="bi bi-graph-down-arrow" viewBox="0 0 1em 1em">
-                        <path fill-rule="evenodd"
-                            d="M0 0h1v15h15v1H0V0Zm10 11.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-1 0v2.6l-3.613-4.417a.5.5 0 0 0-.74-.037L7.06 8.233 3.404 3.206a.5.5 0 0 0-.808.588l4 5.5a.5.5 0 0 0 .758.06l2.609-2.61L13.445 11H10.5a.5.5 0 0 0-.5.5Z" />
-                    </svg> Expense</a>
-            </div>
-            <div class="col-12 col-sm-3  display-5">
-                <a href="balance.php"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
-                        fill="currentColor" class="bi bi-pie-chart" viewBox="0 0 1em 1em">
-                        <path
-                            d="M7.5 1.018a7 7 0 0 0-4.79 11.566L7.5 7.793V1.018zm1 0V7.5h6.482A7.001 7.001 0 0 0 8.5 1.018zM14.982 8.5H8.207l-4.79 4.79A7 7 0 0 0 14.982 8.5zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z" />
-                    </svg> Balance</a>
-            </div>
-        </div>
     </div>
 
     <footer class="page-footer fixed-bottom text-center bg-dark text-white">2022 &#169; Adrian Żuchowski</footer>

@@ -7,7 +7,53 @@
 		header('Location: index.php');
 		exit();
 	}
-	
+	else
+	{
+		$user_id = $_SESSION['id'];
+		
+		require_once "connect.php";
+		mysqli_report(MYSQLI_REPORT_STRICT);
+		try
+		{
+			$connection = new mysqli($host, $db_user, $db_password, $db_name);
+			if ($connection->connect_errno!=0)
+			{
+				throw new Exception(mysqli_connect_errno());
+			}
+			else
+			{
+				$cat_query = "SELECT * FROM incomes_category_assigned_to_users WHERE user_id='$user_id'";
+				$cat_result = mysqli_query($connection, $cat_query);
+				if(isset($_POST['income']))
+				{
+					$income_category_assigned_to_user_id = $_POST['income_cat'];
+					$income_category_query = "SELECT id FROM incomes_category_assigned_to_users WHERE user_id='$user_id' AND name='$income_category_assigned_to_user_id'";
+					$income_category_result = mysqli_query($connection, $income_category_query);
+					$income_row = mysqli_fetch_array($income_category_result);
+					$income_id_cat = $income_row['id'];					
+					$amount = $_POST ['income'];
+					$date_of_income = $_POST['input_date'];
+					$income_comment = $_POST['income_comment'];
+					
+					if($connection->query("INSERT INTO incomes VALUES (NULL, '$user_id', '$income_id_cat', '$amount', '$date_of_income', '$income_comment')"))
+					{
+						$_SESSION['successful_submit']=true;
+						$input_info = "<div class='alert alert-success' role='alert'> Przychód został poprawnie dodany!</div>";
+					}
+					else
+					{
+						throw new Exception($connection->error);
+					}
+				}
+				$connection->close();
+			}
+		}
+			catch(Exception $e)
+		{
+			echo '<span style="color:red;">Błąd serwera! Spróbuj ponownie za chwilę.</span>';
+			echo '<br/>Informacja developerska: '.$e;
+		}	
+	}
 ?>
 
 <!DOCTYPE html>
@@ -18,7 +64,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <!-- <link rel="stylesheet" href="my_styles.css"> -->
+    <link rel="stylesheet" href="my_styles.css">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
@@ -99,35 +145,41 @@
         </div>
 
         <div class="budget_panel">
-            <form action="main.php">
-            <div class="row col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
-                <label for="income"></label>
-                <input type="number" class="rounded-pill" name="income" id="income" placeholder="100,00 zł" required>
-            </div>
-            <div class="row col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
-                <label for="input_date"></label>
-                <input type="date" class="rounded-pill" name="input_date" id="input_date" required>
-            </div>
-            <div class="row col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
-                <label for="income_cat"></label>
-                <select name="income_cat" id="income_cat" class="rounded-pill" >
-                    <option value="salary">Wynagrodzenie</option>
-                    <option value="bank_interest">Odsetki bankowe</option>
-                    <option value="allegro">Sprzedaż na allegro</option>
-                    <option value="others">Inne</option>
-                </select>
-            </div>
-            <div class="row col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
-                    <label for="income_comment"></label>
-                    <textarea name="income_comment" cols="20" rows="5" class="rounded" id="income_comment"
-                        placeholder="Uwagi (opcjonalnie)"></textarea>
-            </div>
-            <div class="row col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
-                <div class="buttons text-center">
-                    <button type="submit" class="rounded-pill">Dodaj</button>
-                    <button type="submit" class="rounded-pill" formnovalidate>Anuluj</button>
-                </div>
-            </div>
+            <form  method="POST">
+				<?php
+					if(isset($_SESSION['successful_submit']))
+					{
+						echo "<div class='row col-4 mx-auto my-2 rounded-pill alert alert-success text-center col-3 justify-content-center center' role='alert'> Przychód został poprawnie dodany!</div>";
+						unset($_SESSION['successful_submit']);
+					}
+				?>
+				<div class="row col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
+					<label for="income"></label>
+					<input type="number" step="0.01" class="rounded-pill" name="income" placeholder="100,00 zł" required>
+				</div>
+				<div class="row col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
+					<label for="input_date"></label>
+					<input type="date" class="rounded-pill" name="input_date" id="input_date" required>
+				</div>
+				<div class="row col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
+					<label for="income_cat"></label>
+					<select name="income_cat" id="income_cat" class="rounded-pill" >
+						<?php while($row = mysqli_fetch_array($cat_result)):;?>
+						<option value="<?php echo $row['name'];?>"><?php echo $row['name'];?></option>
+						<?php endwhile;?>
+					</select>
+				</div>
+				<div class="row col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
+						<label for="income_comment"></label>
+						<textarea name="income_comment" cols="20" rows="5" class="rounded" id="income_comment"
+							placeholder="Uwagi (opcjonalnie)"></textarea>
+				</div>
+				<div class="row col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
+					<div class="buttons text-center">
+						<button type="submit" class="rounded-pill">Dodaj</button>
+						<button type="submit" class="rounded-pill" formnovalidate>Anuluj</button>
+					</div>
+				</div>
             </form>
         </div>
     </main>

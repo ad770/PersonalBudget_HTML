@@ -14,7 +14,7 @@
 		
 		if ($connection->connect_errno!=0)
 		{
-				echo "Error:".$connection->connect_errno;
+			echo "Error:".$connection->connect_errno;
 		}
 		else
 		{
