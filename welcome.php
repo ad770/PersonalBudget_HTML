@@ -41,4 +41,3 @@
 	if (isset($_SESSION['e_username'])) unset($_SESSION['e_username']);
 	if (isset($_SESSION['e_email'])) unset($_SESSION['e_email']);
 	if (isset($_SESSION['e_password'])) unset($_SESSION['e_password']);
-	?>
