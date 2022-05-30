@@ -20,6 +20,9 @@ if (!isset($_SESSION['logged'])) {
             $end_of_previous_month = date('Y-m-d', strtotime("last day of last month"));
             $begin_of_current_year = date('Y-m-d', strtotime("first day of january"));
             $end_of_current_year = date('Y-m-d', strtotime("last day of december"));
+            $begin_date = $begin_of_current_month;
+            $end_date = $end_of_current_month;
+
             $connection->close();
         }
     } catch (Exception $e) {
@@ -39,7 +42,6 @@ if (!isset($_SESSION['logged'])) {
     <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="my_styles.css">
-
 </head>
 
 <body>
@@ -60,7 +62,6 @@ if (!isset($_SESSION['logged'])) {
             </div>
         </div>
     </nav>
-
     <div class="container">
         <div class="nav-item">
             <div class="row">
@@ -94,93 +95,51 @@ if (!isset($_SESSION['logged'])) {
                 </div>
             </div>
         </div>
-
         <div class="balance_panel">
-
             <div class="select_balance">
                 <div class="balance_content text-end">
-                    <select name="balance" onchange="showBalance()" id="time_option">
-                        <option value="current_month" selected>Bieżący miesiąc</option>
-                        <option value="previous_month">Poprzedni miesiąc</option>
-                        <option value="current_year">Bieżący rok</option>
-                        <option value="undenify">Niestandardowy</option>
-                    </select>
+                    <form method="post" name="myForm">
+                        <select name="balance" onchange="myForm.submit()" id="time_option">
+                            <option value="current_month" selected>Bieżący miesiąc</option>
+                            <option value="previous_month">Poprzedni miesiąc</option>
+                            <option value="current_year">Bieżący rok</option>
+                            <option value="undenify">Niestandardowy</option>
+                        </select>
+                    </form>
                 </div>
                 <div class="show_balance">
                     <div class="row text-center">
                         <div class="col-10 col-md-5 mx-auto">
                             <div class="income_balance">
-                                <script>
-                                    function showBalance() {
-                                        let text;
-                                        let state = document.getElementById("time_option").value;
-                                        switch (state) {
-                                            case "current_month":
-                                                <?php
-                                                $begin_date = $begin_of_current_month;
-                                                $end_date = $end_of_current_month;
-                                                $info = "Current month";
-                                                $info2 = 4;
-                                                ?>
-                                                console.log(state);
-                                                text = "current month";
-                                                break;
-                                            case "previous_month":
-                                                <?php
-                                                $begin_date = $begin_of_previous_month;
-                                                $end_date = $end_of_previous_month;
-                                                $info = "Previous month";
-                                                $info2 *= 2;
-                                                ?>
-                                                text = "previous month";
-                                                console.log(state);
-                                                break;
-                                            case "current_year":
-                                                <?php
-                                                $begin_date = $begin_of_current_year;
-                                                $end_date = $end_of_current_year;
-                                                $info = "Current year";
-                                                $info2 *= 2;
-                                                ?>
-                                                text = "current year";
-                                                console.log(state);
-                                                break;
-                                            case "undenify":
-
-                                                // <div class="row col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
-                                                //     <label for="begin_date"></label>
-                                                //     <input type="date" class="rounded-pill" name="begin_date" id="begin_date" required>
-                                                // </div>
-                                                // <div class="row col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
-                                                //     <label for="end_date"></label>
-                                                //     <input type="date" class="rounded-pill" name="end_date" id="end_date" required>
-                                                // </div>
-
-                                                break;
-                                            default:
-                                                <?php
-
-                                                ?>
-                                                break;
-                                        }
-                                        console.log(text);
-                                        console.log("<?php echo $info ?>");
-                                        console.log("<?php echo $begin_date ?>");
-                                    }
-                                    state.addEventListener('change', showBalance, false);
-                                </script>
-
                                 <?php
                                 $connection = new mysqli($host, $db_user, $db_password, $db_name);
                                 if ($connection->connect_errno != 0) {
                                     throw new Exception(mysqli_connect_errno());
                                 } else {
+                                    $state = $_POST['balance'];
+                                    switch ($state) {
+                                        case "current_month":
+                                            $begin_date = $begin_of_current_month;
+                                            $end_date = $end_of_current_month;
+                                            break;
+                                        case "previous_month":
+                                            $begin_date = $begin_of_previous_month;
+                                            $end_date = $end_of_previous_month;
+                                            break;
+                                        case "current_year":
+                                            $begin_date = $begin_of_current_year;
+                                            $end_date = $end_of_current_year;
+                                            break;
+                                        case "undenify":
+                                            break;
+                                        default:
+                                            break;
+                                    }
+
                                     $income_query = "SELECT * FROM incomes WHERE user_id='$user_id' and date_of_income between '$begin_date' and '$end_date' ORDER BY date_of_income ASC";
                                     $expense_query = "SELECT * from expenses WHERE user_id='$user_id' and date_of_expense between '$begin_date' and '$end_date' ORDER BY 'date_of_expense' ASC";
                                     $income_result = mysqli_query($connection, $income_query);
                                     $expense_result = mysqli_query($connection, $expense_query);
-                                    echo $info;
-                                    echo $info2;
                                     if ($income_result->num_rows > 0) {
                                         echo "<div class='h2'>Przychody</div>";
                                         echo "<table class='table table-bordered table-striped'>";
