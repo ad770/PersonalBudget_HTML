@@ -20,8 +20,6 @@ if (!isset($_SESSION['logged'])) {
             $end_of_previous_month = date('Y-m-d', strtotime("last day of last month"));
             $begin_of_current_year = date('Y-m-d', strtotime("first day of january"));
             $end_of_current_year = date('Y-m-d', strtotime("last day of december"));
-            $begin_date = $begin_of_current_month;
-            $end_date = $end_of_current_month;
 
             $connection->close();
         }
@@ -99,11 +97,19 @@ if (!isset($_SESSION['logged'])) {
             <div class="select_balance">
                 <div class="balance_content text-end">
                     <form method="post" name="myForm">
-                        <select name="balance" onchange="myForm.submit()" id="time_option">
-                            <option value="current_month" selected>Bieżący miesiąc</option>
-                            <option value="previous_month">Poprzedni miesiąc</option>
-                            <option value="current_year">Bieżący rok</option>
-                            <option value="undenify">Niestandardowy</option>
+                        <select name="balance" onchange="this.form.submit()" id="time_option">
+                            <option value="current_month" <?php if ('balance' == "current_month") {
+                                                                echo ' selected="selected"';
+                                                            } ?>>Bieżący miesiąc</option>
+                            <option value="previous_month" <?php if ('balance' == "previous_month") {
+                                                                echo ' selected="selected"';
+                                                            } ?>>Poprzedni miesiąc</option>
+                            <option value="current_year" <?php if ('balance' == "current_year") {
+                                                                echo ' selected="selected"';
+                                                            } ?>>Bieżący rok</option>
+                            <option value="undenify" <?php if ('balance' == "undenify") {
+                                                            echo ' selected="selected"';
+                                                        } ?>>Niestandardowy</option>
                         </select>
                     </form>
                 </div>
@@ -112,30 +118,29 @@ if (!isset($_SESSION['logged'])) {
                         <div class="col-10 col-md-5 mx-auto">
                             <div class="income_balance">
                                 <?php
+                                $state = $_POST['balance'];
+                                switch ($state) {
+                                    case "current_month":
+                                        $begin_date = $begin_of_current_month;
+                                        $end_date = $end_of_current_month;
+                                        break;
+                                    case "previous_month":
+                                        $begin_date = $begin_of_previous_month;
+                                        $end_date = $end_of_previous_month;
+                                        break;
+                                    case "current_year":
+                                        $begin_date = $begin_of_current_year;
+                                        $end_date = $end_of_current_year;
+                                        break;
+                                    case "undenify":
+                                        break;
+                                    default:
+                                        break;
+                                }
                                 $connection = new mysqli($host, $db_user, $db_password, $db_name);
                                 if ($connection->connect_errno != 0) {
                                     throw new Exception(mysqli_connect_errno());
                                 } else {
-                                    $state = $_POST['balance'];
-                                    switch ($state) {
-                                        case "current_month":
-                                            $begin_date = $begin_of_current_month;
-                                            $end_date = $end_of_current_month;
-                                            break;
-                                        case "previous_month":
-                                            $begin_date = $begin_of_previous_month;
-                                            $end_date = $end_of_previous_month;
-                                            break;
-                                        case "current_year":
-                                            $begin_date = $begin_of_current_year;
-                                            $end_date = $end_of_current_year;
-                                            break;
-                                        case "undenify":
-                                            break;
-                                        default:
-                                            break;
-                                    }
-
                                     $income_query = "SELECT * FROM incomes WHERE user_id='$user_id' and date_of_income between '$begin_date' and '$end_date' ORDER BY date_of_income ASC";
                                     $expense_query = "SELECT * from expenses WHERE user_id='$user_id' and date_of_expense between '$begin_date' and '$end_date' ORDER BY 'date_of_expense' ASC";
                                     $income_result = mysqli_query($connection, $income_query);
