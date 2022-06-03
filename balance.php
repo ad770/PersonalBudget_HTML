@@ -95,22 +95,23 @@ if (!isset($_SESSION['logged'])) {
         </div>
         <div class="balance_panel">
             <div class="select_balance">
-                <div class="balance_content text-end">
-                    <form method="post" name="myForm">
-                        <select name="balance" onchange="this.form.submit()" id="time_option">
-                            <option value="current_month" <?php if ('balance' == "current_month") {
-                                                                echo ' selected="selected"';
+                <div class="balance_content d-flex justify-content-center">
+                    <form class="form-inline" method="post" name="myForm">
+                        <select class="form-group mt-3" name="balance" id="time_option">
+                            <option value="current_month" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'current_month') {
+                                                                echo 'selected= "selected"';
                                                             } ?>>Bieżący miesiąc</option>
-                            <option value="previous_month" <?php if ('balance' == "previous_month") {
-                                                                echo ' selected="selected"';
+                            <option value="previous_month" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'previous_month') {
+                                                                echo 'selected="selected"';
                                                             } ?>>Poprzedni miesiąc</option>
-                            <option value="current_year" <?php if ('balance' == "current_year") {
-                                                                echo ' selected="selected"';
+                            <option value="current_year" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'current_year') {
+                                                                echo 'selected="selected"';
                                                             } ?>>Bieżący rok</option>
-                            <option value="undenify" <?php if ('balance' == "undenify") {
-                                                            echo ' selected="selected"';
+                            <option value="undenify" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'undenify') {
+                                                            echo 'selected="selected"';
                                                         } ?>>Niestandardowy</option>
                         </select>
+                        <button type="submit" name="submit" class="form-group btn btn-dark btn-sm mb-2">Potwierdź</button>
                     </form>
                 </div>
                 <div class="show_balance">
@@ -133,6 +134,7 @@ if (!isset($_SESSION['logged'])) {
                                         $end_date = $end_of_current_year;
                                         break;
                                     case "undenify":
+
                                         break;
                                     default:
                                         break;
