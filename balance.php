@@ -1,6 +1,16 @@
 <?php
 
 session_start();
+$_SESSION['timestamp'] = time(); //set new timestamp
+if (time() - $_SESSION['timestamp'] > 900) { //subtract new timestamp from the old one
+    echo "<script>alert('15 Minutes over!');</script>";
+    unset($_SESSION['username'], $_SESSION['password'], $_SESSION['timestamp']);
+    $_SESSION['logged_in'] = false;
+    header("Location: " . index . php); //redirect to index.php
+    exit;
+} else {
+    $_SESSION['timestamp'] = time(); //set new timestamp
+}
 
 if (!isset($_SESSION['logged'])) {
     header('Location: index.php');
@@ -40,9 +50,10 @@ if (!isset($_SESSION['logged'])) {
     <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="my_styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
-<body>
+<body onload="document.myForm.submit()">
     <nav class="navbar navbar-dark bg-dark justify-content-start p-3">
         <div class="container-fluid">
             <a class="navbar-brand" href="main.php"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-bank2" viewBox="0 0 15 15">
@@ -96,7 +107,7 @@ if (!isset($_SESSION['logged'])) {
         <div class="balance_panel">
             <div class="select_balance">
                 <div class="balance_content d-flex justify-content-center">
-                    <form class="form-inline" method="post" name="myForm">
+                    <form class="form-inline" method="post" id="myForm" name="myForm">
                         <select class="form-group mt-3" name="balance" id="time_option">
                             <option value="current_month" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'current_month') {
                                                                 echo 'selected= "selected"';
@@ -112,6 +123,16 @@ if (!isset($_SESSION['logged'])) {
                                                         } ?>>Niestandardowy</option>
                         </select>
                         <button type="submit" name="submit" class="form-group btn btn-dark btn-sm mb-2">Potwierdź</button>
+                        <div class="hidden" id="specyfic_date">
+                            <div class=" col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
+                                <label for="begin_date"></label>
+                                <input type="date" class="rounded-pill" name="begin_date" id="begin_date" required>
+                            </div>
+                            <div class=" col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
+                                <label for="end_date"></label>
+                                <input type="date" class="rounded-pill" name="end_date" id="end_date" required>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="show_balance">
@@ -134,7 +155,8 @@ if (!isset($_SESSION['logged'])) {
                                         $end_date = $end_of_current_year;
                                         break;
                                     case "undenify":
-
+                                        $begin_date = $_POST['begin_date'];
+                                        $end_date = $_POST['end_date'];
                                         break;
                                     default:
                                         break;
@@ -227,6 +249,25 @@ if (!isset($_SESSION['logged'])) {
     </div>
 
     <footer class="page-footer fixed-bottom text-center bg-dark text-white">2022 &#169; Adrian Żuchowski</footer>
+    <script type="text/javascript">
+        function formAutoSubmit() {
+            let form_submit = document.getElementById("myForm");
+            form_submit.submit();
+        }
+        window.onload = formAutoSubmit;
+    </script>
+    <script>
+        $('.balance').change(function() {
+            let responseDate = $(this).val();
+            if (responseDate == "undenify") {
+                $('#specyfic_date').removeClass("hidden");
+                $('#specyficDate').addClass("show");
+            } else {
+                $('#specyfic_date').removeClass("show");
+                $('#specyficDate').addClass("hidden");
+            }
+        })
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>

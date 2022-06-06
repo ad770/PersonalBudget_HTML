@@ -1,6 +1,13 @@
-		.error
-		{
-			color:red;
+		.error {
+			color: red;
 			margin-top: 5px;
 			margin-bottom: 5px;
+		}
+
+		.hidden {
+			display: none;
+		}
+
+		.show {
+			display: : block;
 		}
