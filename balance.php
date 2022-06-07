@@ -108,7 +108,7 @@ if (!isset($_SESSION['logged'])) {
             <div class="select_balance">
                 <div class="balance_content d-flex justify-content-center">
                     <form class="form-inline" method="post" id="myForm" name="myForm">
-                        <select class="form-group mt-3" name="balance" id="time_option">
+                        <select class="form-group mt-3 mx-auto rounded-pill" name="balance" id="time_option">
                             <option value="current_month" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'current_month') {
                                                                 echo 'selected= "selected"';
                                                             } ?>>Bieżący miesiąc</option>
@@ -122,15 +122,25 @@ if (!isset($_SESSION['logged'])) {
                                                             echo 'selected="selected"';
                                                         } ?>>Niestandardowy</option>
                         </select>
-                        <button type="submit" name="submit" class="form-group btn btn-dark btn-sm mb-2">Potwierdź</button>
-                        <div class="hidden" id="specyfic_date">
-                            <div class=" col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
-                                <label for="begin_date"></label>
-                                <input type="date" class="rounded-pill" name="begin_date" id="begin_date" required>
-                            </div>
-                            <div class=" col-8 col-sm-6 col-md-5 col-lg-4 mx-auto my-2">
-                                <label for="end_date"></label>
-                                <input type="date" class="rounded-pill" name="end_date" id="end_date" required>
+                        <button type="submit" name="submit" class="form-group btn btn-dark btn-sm mb-2 rounded-pill">Potwierdź</button>
+                        <div class="hidden" id="choose_date">
+                            <div class="input-group justify-content-center">
+                                <div class=" col-10 col-sm-8 col-md-6 col-lg-5 mx-2 my-2">
+                                    <label for="begin_date">Data początkowa</label>
+                                    <input type="date" class="rounded-pill" name="begin_date" id="begin_date" placeholder="<?php if (isset($_POST['begin_date'])) {
+                                                                                                                                echo $_POST['begin_date'];
+                                                                                                                            } else {
+                                                                                                                                echo $begin_of_current_month;
+                                                                                                                            } ?>">
+                                </div>
+                                <div class=" col-10 col-sm-8 col-md-6 col-lg-5 mx-2 my-2">
+                                    <label for="end_date">Data końcowa</label>
+                                    <input type="date" class="rounded-pill" name="end_date" id="end_date" placeholder="<?php if (isset($_POST['end_date'])) {
+                                                                                                                            echo $_POST['end_date'];
+                                                                                                                        } else {
+                                                                                                                            echo $end_of_current_month;
+                                                                                                                        } ?>">
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -257,16 +267,16 @@ if (!isset($_SESSION['logged'])) {
         window.onload = formAutoSubmit;
     </script>
     <script>
-        $('.balance').change(function() {
-            let responseDate = $(this).val();
+        $('#time_option').change(function() {
+            var responseDate = $(this).val();
             if (responseDate == "undenify") {
-                $('#specyfic_date').removeClass("hidden");
-                $('#specyficDate').addClass("show");
+                $('#choose_date').removeClass("hidden");
+                $('#choose_date').addClass("show");
             } else {
-                $('#specyfic_date').removeClass("show");
-                $('#specyficDate').addClass("hidden");
+                $('#choose_date').removeClass("show");
+                $('#choose_date').addClass("hidden");
             }
-        })
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
