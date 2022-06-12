@@ -1,21 +1,21 @@
 <?php
 
 session_start();
-$_SESSION['timestamp'] = time(); //set new timestamp
-if (time() - $_SESSION['timestamp'] > 900) { //subtract new timestamp from the old one
-    echo "<script>alert('15 Minutes over!');</script>";
-    unset($_SESSION['username'], $_SESSION['password'], $_SESSION['timestamp']);
-    $_SESSION['logged_in'] = false;
-    header("Location: " . index . php); //redirect to index.php
-    exit;
-} else {
-    $_SESSION['timestamp'] = time(); //set new timestamp
-}
+$_SESSION['timestamp'] = time();
 
 if (!isset($_SESSION['logged'])) {
     header('Location: index.php');
     exit();
 } else {
+    if (time() - $_SESSION['timestamp'] > 10) {
+        echo "<script>alert('10 Minutes over!');</script>";
+        unset($_SESSION['timestamp']);
+        $_SESSION['logged'] = false;
+        header('Location: logout.php');
+        exit;
+    } else {
+        $_SESSION['timestamp'] = time();
+    }
     $user_id = $_SESSION['id'];
     require_once "connect.php";
     mysqli_report(MYSQLI_REPORT_STRICT);
@@ -30,6 +30,7 @@ if (!isset($_SESSION['logged'])) {
             $end_of_previous_month = date('Y-m-d', strtotime("last day of last month"));
             $begin_of_current_year = date('Y-m-d', strtotime("first day of january"));
             $end_of_current_year = date('Y-m-d', strtotime("last day of december"));
+            $today = date('d-m-Y');
 
             $connection->close();
         }
@@ -48,12 +49,12 @@ if (!isset($_SESSION['logged'])) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="my_styles.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 </head>
 
-<body onload="document.myForm.submit()">
+<body onload="onLoadSubmit()">
     <nav class="navbar navbar-dark bg-dark justify-content-start p-3">
         <div class="container-fluid">
             <a class="navbar-brand" href="main.php"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-bank2" viewBox="0 0 15 15">
@@ -106,40 +107,41 @@ if (!isset($_SESSION['logged'])) {
         </div>
         <div class="balance_panel">
             <div class="select_balance">
-                <div class="balance_content d-flex justify-content-center">
-                    <form class="form-inline" method="post" id="myForm" name="myForm">
-                        <select class="form-group mt-3 mx-auto rounded-pill" name="balance" id="time_option">
+                <div class="balance_content d-flex flex-wrap justify-content-center">
+                    <form action="balancepost.php" method="POST" id="myForm" name="myForm">
+                        <select class="form-group mt-3 d-inline align-self-center mx-auto text-center rounded-pill p-1" name="balance" id="time_option">
                             <option value="current_month" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'current_month') {
                                                                 echo 'selected= "selected"';
                                                             } ?>>Bieżący miesiąc</option>
                             <option value="previous_month" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'previous_month') {
-                                                                echo 'selected="selected"';
+                                                                echo 'selected= "selected"';
                                                             } ?>>Poprzedni miesiąc</option>
                             <option value="current_year" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'current_year') {
-                                                                echo 'selected="selected"';
+                                                                echo 'selected= "selected"';
                                                             } ?>>Bieżący rok</option>
                             <option value="undenify" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'undenify') {
-                                                            echo 'selected="selected"';
+                                                            echo 'selected=     "selected"';
                                                         } ?>>Niestandardowy</option>
                         </select>
-                        <button type="submit" name="submit" class="form-group btn btn-dark btn-sm mb-2 rounded-pill">Potwierdź</button>
+                        <button type="submit" name="submit" class="form-group d-inline btn btn-dark btn-sm mb-2 rounded-pill">Potwierdź</button>
+
                         <div class="hidden" id="choose_date">
-                            <div class="input-group justify-content-center">
-                                <div class=" col-10 col-sm-8 col-md-6 col-lg-5 mx-2 my-2">
+                            <div class="input-group justify-content-between">
+                                <div class=" col-10 col-sm-8 col-md-6 col-lg-5 mx-2 my-2 d-flex flex-column align-self-center">
                                     <label for="begin_date">Data początkowa</label>
-                                    <input type="date" class="rounded-pill" name="begin_date" id="begin_date" placeholder="<?php if (isset($_POST['begin_date'])) {
-                                                                                                                                echo $_POST['begin_date'];
-                                                                                                                            } else {
-                                                                                                                                echo $begin_of_current_month;
-                                                                                                                            } ?>">
+                                    <input type="date" class="rounded-pill p-1 text-center" name="begin_date" id="begin_date" placeholder="<?php if (isset($_POST['begin_date'])) {
+                                                                                                                                                echo $_POST['begin_date'];
+                                                                                                                                            } else {
+                                                                                                                                                echo $begin_of_current_month;
+                                                                                                                                            } ?>">
                                 </div>
-                                <div class=" col-10 col-sm-8 col-md-6 col-lg-5 mx-2 my-2">
+                                <div class=" col-10 col-sm-8 col-md-6 col-lg-5 mx-2 my-2 d-flex flex-column align-self-center">
                                     <label for="end_date">Data końcowa</label>
-                                    <input type="date" class="rounded-pill" name="end_date" id="end_date" placeholder="<?php if (isset($_POST['end_date'])) {
-                                                                                                                            echo $_POST['end_date'];
-                                                                                                                        } else {
-                                                                                                                            echo $end_of_current_month;
-                                                                                                                        } ?>">
+                                    <input type="date" class="rounded-pill p-1 text-center" name="end_date" id="end_date" placeholder="<?php if (isset($_POST['end_date'])) {
+                                                                                                                                            echo $_POST['end_date'];
+                                                                                                                                        } else {
+                                                                                                                                            echo $today;
+                                                                                                                                        } ?>">
                                 </div>
                             </div>
                         </div>
@@ -150,27 +152,9 @@ if (!isset($_SESSION['logged'])) {
                         <div class="col-10 col-md-5 mx-auto">
                             <div class="income_balance">
                                 <?php
-                                $state = $_POST['balance'];
-                                switch ($state) {
-                                    case "current_month":
-                                        $begin_date = $begin_of_current_month;
-                                        $end_date = $end_of_current_month;
-                                        break;
-                                    case "previous_month":
-                                        $begin_date = $begin_of_previous_month;
-                                        $end_date = $end_of_previous_month;
-                                        break;
-                                    case "current_year":
-                                        $begin_date = $begin_of_current_year;
-                                        $end_date = $end_of_current_year;
-                                        break;
-                                    case "undenify":
-                                        $begin_date = $_POST['begin_date'];
-                                        $end_date = $_POST['end_date'];
-                                        break;
-                                    default:
-                                        break;
-                                }
+                                $begin_date = $_SESSION['begin_date'];
+                                $end_date = $_SESSION['end_date'];
+
                                 $connection = new mysqli($host, $db_user, $db_password, $db_name);
                                 if ($connection->connect_errno != 0) {
                                     throw new Exception(mysqli_connect_errno());
@@ -207,7 +191,6 @@ if (!isset($_SESSION['logged'])) {
                                         echo "<div class='h3'>Brak przychodów</div>";
                                     }
                                 }
-                                $connection->close();
                                 ?>
                             </div>
                         </div>
@@ -215,7 +198,6 @@ if (!isset($_SESSION['logged'])) {
                             <div class="expense_balance">
                                 <?php
                                 if ($expense_result->num_rows > 0) {
-                                    $connection = new mysqli($host, $db_user, $db_password, $db_name);
                                     echo "<div class='h2'>Wydatki</div>";
                                     echo "<table class='table table-bordered table-striped'>";
                                     echo "<thead>";
@@ -259,16 +241,9 @@ if (!isset($_SESSION['logged'])) {
     </div>
 
     <footer class="page-footer fixed-bottom text-center bg-dark text-white">2022 &#169; Adrian Żuchowski</footer>
-    <script type="text/javascript">
-        function formAutoSubmit() {
-            let form_submit = document.getElementById("myForm");
-            form_submit.submit();
-        }
-        window.onload = formAutoSubmit;
-    </script>
     <script>
-        $('#time_option').change(function() {
-            var responseDate = $(this).val();
+        $('#choose_date').change(function() {
+            let responseDate = $(this).val();
             if (responseDate == "undenify") {
                 $('#choose_date').removeClass("hidden");
                 $('#choose_date').addClass("show");
@@ -278,9 +253,21 @@ if (!isset($_SESSION['logged'])) {
             }
         });
     </script>
+    <script language="javascript">
+        function onLoadSubmit() {
+            document.myForm.submit();
+        }
+    </script>
+    <script>
+        $(function() {
+            $('#myform').submit();
+
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </body>
 
 </html>
