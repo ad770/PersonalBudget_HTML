@@ -8,51 +8,42 @@ if (!isset($_SESSION['logged'])) {
 } else {
 	$user_id = $_SESSION['id'];
 
-	require_once "connect.php";
-	mysqli_report(MYSQLI_REPORT_STRICT);
-	try {
-		$connection = new mysqli($host, $db_user, $db_password, $db_name);
-		if ($connection->connect_errno != 0) {
-			throw new Exception(mysqli_connect_errno());
-		} else {
-			$cat_query = "SELECT * FROM incomes_category_assigned_to_users WHERE user_id='$user_id'";
-			$cat_result = mysqli_query($connection, $cat_query);
-			if (isset($_POST['income'])) {
-				$is_good = true;
-				$income_value = $_POST['income'];
-				if ($income_value < 0) {
-					$is_good = false;
-					$_SESSION['e_income_value'] = "Wartość musi być większa od 0!";
-				}
+	require_once "database.php";
+	$cat_query = $db->prepare("SELECT * FROM incomes_category_assigned_to_users WHERE user_id='$user_id'");
+	$cat_query->execute();
 
-				if (filter_var($income_value, FILTER_VALIDATE_FLOAT) == false) {
-					$is_good = false;
-					$_SESSION['e_income_value'] = "Wprowadź liczbę!";
-				}
-
-				$income_category_assigned_to_user_id = $_POST['income_cat'];
-				$income_category_query = "SELECT id FROM incomes_category_assigned_to_users WHERE user_id='$user_id' AND name='$income_category_assigned_to_user_id'";
-				$income_category_result = mysqli_query($connection, $income_category_query);
-				$income_row = mysqli_fetch_array($income_category_result);
-				$income_id_cat = $income_row['id'];
-				$date_of_income = $_POST['input_date'];
-
-				$income_comment = $_POST['income_comment'];
-
-				if ($connection->query("INSERT INTO incomes VALUES (NULL, '$user_id', '$income_id_cat', '$income_value', '$date_of_income', '$income_comment')")) {
-					$_SESSION['successful_submit'] = true;
-					$input_info = "<div id='hide_message' class='row col-3 p-2 mx-auto my-2 rounded-pill alert alert-success text-center col-3 justify-content-center center' role='alert'> Przychód został poprawnie dodany!</div>";
-				} else {
-					throw new Exception($connection->error);
-				}
-			}
-			$connection->close();
+	if (isset($_POST['income'])) {
+		$is_good = true;
+		$income_value = $_POST['income'];
+		if ($income_value < 0) {
+			$is_good = false;
+			$_SESSION['e_income_value'] = "Wartość musi być większa od 0!";
 		}
-	} catch (Exception $e) {
-		echo '<span style="color:red;">Błąd serwera! Spróbuj ponownie za chwilę.</span>';
-		echo '<br/>Informacja developerska: ' . $e;
+
+		if (filter_var($income_value, FILTER_VALIDATE_FLOAT) == false) {
+			$is_good = false;
+			$_SESSION['e_income_value'] = "Wprowadź liczbę!";
+		}
+
+		$income_category_assigned_to_user_id = $_POST['income_cat'];
+
+		$income_category_query = $db->prepare("SELECT id FROM incomes_category_assigned_to_users WHERE user_id='$user_id' AND name='$income_category_assigned_to_user_id'");
+		$income_category_query->execute();
+		$income_category_result = $income_category_query->fetch(PDO::FETCH_ASSOC);
+		$income_id_cat = $income_category_result['id'];
+
+		$date_of_income = $_POST['input_date'];
+		$income_comment = $_POST['income_comment'];
+
+		$statement = $db->prepare("INSERT INTO incomes VALUES (NULL, '$user_id', '$income_id_cat', '$income_value', '$date_of_income', '$income_comment')");
+		if ($statement->execute()) {
+			$_SESSION['successful_submit'] = true;
+		} else {
+			echo " Nie udało się!";
+		}
 	}
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -126,7 +117,7 @@ if (!isset($_SESSION['logged'])) {
 				<form method="POST">
 					<?php
 					if (isset($_SESSION['successful_submit'])) {
-						echo $input_info;
+						echo "<div id='hide_message' class='row col-9 p-2 mx-auto my-2 rounded-pill alert alert-success text-center col-3 justify-content-center center' role='alert'> Przychód został poprawnie dodany!</div>";
 						unset($_SESSION['successful_submit']);
 					}
 					?>
@@ -147,9 +138,11 @@ if (!isset($_SESSION['logged'])) {
 					<div class="row w-75 mx-auto my-2">
 						<label for="income_cat"></label>
 						<select name="income_cat" id="income_cat" class="rounded-pill">
-							<?php while ($row = mysqli_fetch_array($cat_result)) :; ?>
-								<option value="<?php echo $row['name']; ?>"><?php echo $row['name']; ?></option>
-							<?php endwhile; ?>
+							<option disabled selected>Wybierz kategorię przychodu</option>
+							<?php
+							while ($cat_results = $cat_query->fetch(PDO::FETCH_ASSOC)) {
+								echo "<option value='" . $cat_results['name'] . "''>" . $cat_results['name'] . "</option>";
+							} ?>
 						</select>
 					</div>
 					<div class="row w-75 mx-auto my-2">

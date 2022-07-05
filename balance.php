@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 $_SESSION['timestamp'] = time();
 
@@ -7,37 +6,16 @@ if (!isset($_SESSION['logged'])) {
     header('Location: index.php');
     exit();
 } else {
-    if (time() - $_SESSION['timestamp'] > 10) {
-        echo "<script>alert('10 Minutes over!');</script>";
-        unset($_SESSION['timestamp']);
-        $_SESSION['logged'] = false;
-        header('Location: logout.php');
-        exit;
-    } else {
-        $_SESSION['timestamp'] = time();
-    }
     $user_id = $_SESSION['id'];
-    require_once "connect.php";
-    mysqli_report(MYSQLI_REPORT_STRICT);
-    try {
-        $connection = new mysqli($host, $db_user, $db_password, $db_name);
-        if ($connection->connect_errno != 0) {
-            throw new Exception(mysqli_connect_errno());
-        } else {
-            $begin_of_current_month = date('Y-m-d', strtotime("first day of this month"));
-            $end_of_current_month = date('Y-m-d', strtotime("last day of this month"));
-            $begin_of_previous_month = date('Y-m-d', strtotime("first day of last month"));
-            $end_of_previous_month = date('Y-m-d', strtotime("last day of last month"));
-            $begin_of_current_year = date('Y-m-d', strtotime("first day of january"));
-            $end_of_current_year = date('Y-m-d', strtotime("last day of december"));
-            $today = date('d-m-Y');
+    require_once "database.php";
 
-            $connection->close();
-        }
-    } catch (Exception $e) {
-        echo '<span style="color:red;">Błąd serwera! Spróbuj ponownie za chwilę.</span>';
-        echo '<br/>Informacja developerska: ' . $e;
-    }
+    $begin_of_current_month = date('Y-m-d', strtotime("first day of this month"));
+    $end_of_current_month = date('Y-m-d', strtotime("last day of this month"));
+    $begin_of_previous_month = date('Y-m-d', strtotime("first day of last month"));
+    $end_of_previous_month = date('Y-m-d', strtotime("last day of last month"));
+    $begin_of_current_year = date('Y-m-d', strtotime("first day of january"));
+    $end_of_current_year = date('Y-m-d', strtotime("last day of december"));
+    $today = date('d-m-Y');
 }
 ?>
 
@@ -50,11 +28,11 @@ if (!isset($_SESSION['logged'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="my_styles.css">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
-<body onload="onLoadSubmit()">
+<body>
     <nav class="navbar navbar-dark bg-dark justify-content-start p-3">
         <div class="container-fluid">
             <a class="navbar-brand" href="main.php"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-bank2" viewBox="0 0 15 15">
@@ -105,133 +83,143 @@ if (!isset($_SESSION['logged'])) {
                 </div>
             </div>
         </div>
-        <div class="balance_panel">
-            <div class="select_balance">
-                <div class="balance_content d-flex flex-wrap justify-content-center">
-                    <form action="balancepost.php" method="POST" id="myForm" name="myForm">
-                        <select class="form-group mt-3 d-inline align-self-center mx-auto text-center rounded-pill p-1" name="balance" id="time_option">
-                            <option value="current_month" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'current_month') {
-                                                                echo 'selected= "selected"';
-                                                            } ?>>Bieżący miesiąc</option>
-                            <option value="previous_month" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'previous_month') {
-                                                                echo 'selected= "selected"';
-                                                            } ?>>Poprzedni miesiąc</option>
-                            <option value="current_year" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'current_year') {
-                                                                echo 'selected= "selected"';
-                                                            } ?>>Bieżący rok</option>
-                            <option value="undenify" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'undenify') {
-                                                            echo 'selected=     "selected"';
-                                                        } ?>>Niestandardowy</option>
-                        </select>
-                        <button type="submit" name="submit" class="form-group d-inline btn btn-dark btn-sm mb-2 rounded-pill">Potwierdź</button>
-
-                        <div class="hidden" id="choose_date">
-                            <div class="input-group justify-content-between">
-                                <div class=" col-10 col-sm-8 col-md-6 col-lg-5 mx-2 my-2 d-flex flex-column align-self-center">
-                                    <label for="begin_date">Data początkowa</label>
-                                    <input type="date" class="rounded-pill p-1 text-center" name="begin_date" id="begin_date" placeholder="<?php if (isset($_POST['begin_date'])) {
-                                                                                                                                                echo $_POST['begin_date'];
-                                                                                                                                            } else {
-                                                                                                                                                echo $begin_of_current_month;
-                                                                                                                                            } ?>">
-                                </div>
-                                <div class=" col-10 col-sm-8 col-md-6 col-lg-5 mx-2 my-2 d-flex flex-column align-self-center">
-                                    <label for="end_date">Data końcowa</label>
-                                    <input type="date" class="rounded-pill p-1 text-center" name="end_date" id="end_date" placeholder="<?php if (isset($_POST['end_date'])) {
-                                                                                                                                            echo $_POST['end_date'];
-                                                                                                                                        } else {
-                                                                                                                                            echo $today;
-                                                                                                                                        } ?>">
+        <div class="container">
+            <div class="balance_panel">
+                <div class="select_balance">
+                    <div class="balance_content d-flex flex-wrap justify-content-center">
+                        <form method="POST" id="myForm" name="myForm">
+                            <select class="d-flex mt-3 align-self-center mx-auto text-center rounded-pill p-1" name="balance" id="time_option" onChange="form.submit()">
+                                <option value="current_month" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'current_month') {
+                                                                    echo 'selected= "selected"';
+                                                                } ?>>Bieżący miesiąc</option>
+                                <option value="previous_month" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'previous_month') {
+                                                                    echo 'selected= "selected"';
+                                                                } ?>>Poprzedni miesiąc</option>
+                                <option value="current_year" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'current_year') {
+                                                                    echo 'selected= "selected"';
+                                                                } ?>>Bieżący rok</option>
+                                <option value="undenify" <?php if (isset($_POST['balance']) && $_POST['balance'] == 'undenify') {
+                                                                echo 'selected=     "selected"';
+                                                            } ?>>Niestandardowy</option>
+                            </select>
+                            <div class="hidden" id="choose_date" onChange="form.submit()">
+                                <div class="input-group justify-content-between">
+                                    <div class=" col-10 col-sm-8 col-md-6 col-lg-5 mx-2 my-2 d-flex flex-column align-self-center">
+                                        <label for="begin_date">Data początkowa</label>
+                                        <input type="date" class="rounded-pill p-1 text-center" name="begin_date" id="begin_date">
+                                    </div>
+                                    <div class=" col-10 col-sm-8 col-md-6 col-lg-5 mx-2 my-2 d-flex flex-column align-self-center">
+                                        <label for="end_date">Data końcowa</label>
+                                        <input type="date" class="rounded-pill p-1 text-center" name="end_date" id="end_date">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="show_balance">
-                    <div class="row text-center">
-                        <div class="col-10 col-md-5 mx-auto">
-                            <div class="income_balance">
-                                <?php
-                                $begin_date = $_SESSION['begin_date'];
-                                $end_date = $_SESSION['end_date'];
+                            <?php
+                            if (isset($_POST['balance'])) {
+                                $state = $_POST['balance'];
+                            } else {
+                                $begin_date = $begin_of_current_month;
+                                $end_date = $end_of_current_month;
+                                $state = "current_month";
+                            }
 
-                                $connection = new mysqli($host, $db_user, $db_password, $db_name);
-                                if ($connection->connect_errno != 0) {
-                                    throw new Exception(mysqli_connect_errno());
-                                } else {
-                                    $income_query = "SELECT * FROM incomes WHERE user_id='$user_id' and date_of_income between '$begin_date' and '$end_date' ORDER BY date_of_income ASC";
-                                    $expense_query = "SELECT * from expenses WHERE user_id='$user_id' and date_of_expense between '$begin_date' and '$end_date' ORDER BY 'date_of_expense' ASC";
-                                    $income_result = mysqli_query($connection, $income_query);
-                                    $expense_result = mysqli_query($connection, $expense_query);
-                                    if ($income_result->num_rows > 0) {
-                                        echo "<div class='h2'>Przychody</div>";
-                                        echo "<table class='table table-bordered table-striped'>";
-                                        echo "<thead>";
-                                        echo "<tr>";
-                                        echo "<th>Kategoria</th>";
-                                        echo "<th>Wartość PLN</th>";
-                                        echo "<th>Data</th>";
-                                        echo "<th>Komentarz</th>";
-                                        echo "</tr>";
-                                        echo "</thead>";
-                                        while ($income_row = mysqli_fetch_array($income_result)) {
+                            switch ($state) {
+                                case "current_month":
+                                    $begin_date = $begin_of_current_month;
+                                    $end_date = $end_of_current_month;
+                                    break;
+                                case "previous_month":
+                                    $begin_date = $begin_of_previous_month;
+                                    $end_date = $end_of_previous_month;
+                                    break;
+                                case "current_year":
+                                    $begin_date = $begin_of_current_year;
+                                    $end_date = $end_of_current_year;
+                                    break;
+                                case "undenify":
+                                    $begin_date = $_POST['begin_date'];
+                                    $end_date = $_POST['end_date'];
+                                    break;
+                                default:
+                                    break;
+                            }
+                            ?>
+                        </form>
+                    </div>
+                    <div class="show_balance">
+                        <div class="row text-center">
+                            <div class="col-10 col-md-5 mx-auto">
+                                <div class="income_balance">
+                                    <?php
+                                    $user_id = 6;
+                                    ?>
+                                    <div class='h2'>Przychody</div>
+                                    <table class='table table-bordered table-striped'>
+                                        <thead>
+                                            <tr>
+                                                <th>Kategoria</th>
+                                                <th>Wartość PLN</th>
+                                                <th>Data</th>
+                                                <th>Komentarz</th>
+                                            </tr>
+                                        </thead>
+
+                                        <?php
+                                        $get_income_data = $db->prepare("SELECT * FROM incomes WHERE user_id='$user_id' and date_of_income between '$begin_date' and '$end_date' ORDER BY date_of_income ASC");
+                                        $get_income_data->execute();
+                                        while ($income_result = $get_income_data->fetch(PDO::FETCH_ASSOC)) {
+                                            $income_category_id = $income_result['income_category_assigned_to_user_id'];
+                                            $get_income_cat = $db->prepare("SELECT name FROM incomes_category_assigned_to_users WHERE id=$income_category_id");
+                                            $get_income_cat->execute();
+                                            $income_cat_result = $get_income_cat->fetch(PDO::FETCH_ASSOC);
                                             echo "<tr>";
-                                            $income_category_id = $income_row['income_category_assigned_to_user_id'];
-                                            $income_category_query = "SELECT name FROM incomes_category_assigned_to_users WHERE id='$income_category_id'";
-                                            $income_category_result = mysqli_query($connection, $income_category_query);
-                                            $income_category_row = mysqli_fetch_array($income_category_result);
-                                            echo "<td>" . $income_category_row['name'] . "</td>";
-                                            echo "<td>" . $income_row['amount'] . "</td>";
-                                            echo "<td>" . $income_row['date_of_income'] . "</td>";
-                                            echo "<td>" . $income_row['income_comment'] . "</td>";
+                                            echo "<td>" . $income_cat_result['name'] . "</td>";
+                                            echo "<td>" . $income_result['amount'] . "</td>";
+                                            echo "<td>" . $income_result['date_of_income'] . "</td>";
+                                            echo "<td>" . $income_result['income_comment'] . "</td>";
                                             echo "</tr>";
                                         }
-                                        echo "</table>";
-                                    } else {
-                                        echo "<div class='h3'>Brak przychodów</div>";
-                                    }
-                                }
-                                ?>
+                                        ?>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-10 col-md-6 mx-auto">
-                            <div class="expense_balance">
-                                <?php
-                                if ($expense_result->num_rows > 0) {
-                                    echo "<div class='h2'>Wydatki</div>";
-                                    echo "<table class='table table-bordered table-striped'>";
-                                    echo "<thead>";
-                                    echo "<tr>";
-                                    echo "<th>Kategoria</th>";
-                                    echo "<th>Wartość PLN</th>";
-                                    echo "<th>Metoda</th>";
-                                    echo "<th>Data</th>";
-                                    echo "<th>Komentarz</th>";
-                                    echo "</tr>";
-                                    echo "</thead>";
-                                    while ($expense_row = mysqli_fetch_array($expense_result)) {
-                                        echo "<tr>";
-                                        $expense_category_id = $expense_row['expense_category_assigned_to_user_id'];
-                                        $expense_category_query = "SELECT name FROM expenses_category_assigned_to_users WHERE id='$expense_category_id'";
-                                        $expense_category_result = mysqli_query($connection, $expense_category_query);
-                                        $expense_category_row = mysqli_fetch_array($expense_category_result);
-                                        echo "<td>" . $expense_category_row['name'] . "</td>";
-                                        echo "<td>" . $expense_row['amount'] . "</td>";
-                                        $payment_method_id = $expense_row['payment_method_assigned_to_user_id'];
-                                        $payment_method_query = "SELECT name FROM payment_methods_assigned_to_users WHERE id='$payment_method_id'";
-                                        $payment_method_result = mysqli_query($connection, $payment_method_query);
-                                        $payment_method_row = mysqli_fetch_array($payment_method_result);
-                                        echo "<td>" . $payment_method_row['name'] . "</td>";
-                                        echo "<td>" . $expense_row['date_of_expense'] . "</td>";
-                                        echo "<td>" . $expense_row['expense_comment'] . "</td>";
-                                        echo "</tr>";
-                                    }
-                                    echo "</table>";
-                                    $connection->close();
-                                } else {
-                                    echo "<div class='h3'>Brak wydatków</div>";
-                                }
-                                ?>
+                            <div class="col-10 col-md-6 mx-auto">
+                                <div class="expense_balance">
+                                    <div class='h2'>Wydatki</div>
+                                    <table class='table table-bordered table-striped'>
+                                        <thead>
+                                            <tr>
+                                                <th>Kategoria</th>
+                                                <th>Wartość PLN</th>
+                                                <th>Metoda</th>
+                                                <th>Data</th>
+                                                <th>Komentarz</th>
+                                            </tr>
+                                        </thead>
+
+                                        <?php
+                                        $get_expense_data = $db->prepare("SELECT * FROM expenses WHERE user_id='$user_id' and date_of_expense between '$begin_date' and '$end_date' ORDER BY date_of_expense ASC");
+                                        $get_expense_data->execute();
+                                        while ($expense_result = $get_expense_data->fetch(PDO::FETCH_ASSOC)) {
+                                            $expense_category_id = $expense_result['expense_category_assigned_to_user_id'];
+                                            $get_expense_cat = $db->prepare("SELECT name FROM expenses_category_assigned_to_users WHERE id=$expense_category_id");
+                                            $get_expense_cat->execute();
+                                            $expense_cat_result = $get_expense_cat->fetch(PDO::FETCH_ASSOC);
+                                            $payment_method_id = $expense_result['payment_method_assigned_to_user_id'];
+                                            $get_payment_id = $db->prepare("SELECT name FROM payment_methods_assigned_to_users WHERE id='$payment_method_id'");
+                                            $get_payment_id->execute();
+                                            $payment_id_result = $get_payment_id->fetch(PDO::FETCH_ASSOC);
+                                            echo "<tr>";
+                                            echo "<td>" . $expense_cat_result['name'] . "</td>";
+                                            echo "<td>" . $expense_result['amount'] . "</td>";
+                                            echo "<td>" . $payment_id_result['name'] . "</td>";
+                                            echo "<td>" . $expense_result['date_of_expense'] . "</td>";
+                                            echo "<td>" . $expense_result['expense_comment'] . "</td>";
+                                            echo "</tr>";
+                                        }
+                                        ?>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -242,32 +230,23 @@ if (!isset($_SESSION['logged'])) {
 
     <footer class="page-footer fixed-bottom text-center bg-dark text-white">2022 &#169; Adrian Żuchowski</footer>
     <script>
-        $('#choose_date').change(function() {
-            let responseDate = $(this).val();
-            if (responseDate == "undenify") {
-                $('#choose_date').removeClass("hidden");
-                $('#choose_date').addClass("show");
-            } else {
-                $('#choose_date').removeClass("show");
-                $('#choose_date').addClass("hidden");
-            }
-        });
-    </script>
-    <script language="javascript">
-        function onLoadSubmit() {
-            document.myForm.submit();
-        }
+        document.getElementById('begin_date').value = <?php if (isset($_POST['begin_date'])) echo $_POST['begin_date'];
+                                                        else echo $begin_date; ?>;
+        document.getElementById('end_date').value = <?php if (isset($_POST['end_date'])) echo $_POST['end_date'];
+                                                    else echo $end_date; ?>;
     </script>
     <script>
-        $(function() {
-            $('#myform').submit();
-
+        $('#time_option').change(function() {
+            if ($(this).val() == "undenify") {
+                $('#choose_date').removeClass("hidden");
+            } else {
+                $('#choose_date').removeClass("show");
+            }
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </body>
 
 </html>

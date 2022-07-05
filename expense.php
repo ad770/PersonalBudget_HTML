@@ -8,61 +8,46 @@ if (!isset($_SESSION['logged'])) {
 } else {
     $user_id = $_SESSION['id'];
 
-    require_once "connect.php";
-    mysqli_report(MYSQLI_REPORT_STRICT);
-    try {
-        $connection = new mysqli($host, $db_user, $db_password, $db_name);
-        if ($connection->connect_errno != 0) {
-            throw new Exception(mysqli_connect_errno());
-        } else {
-            $payment_query = "SELECT * FROM payment_methods_assigned_to_users WHERE user_id='$user_id'";
-            $payment_result = mysqli_query($connection, $payment_query);
+    require_once "database.php";
+    $payment_query = $db->prepare("SELECT * FROM payment_methods_assigned_to_users WHERE user_id='$user_id'");
+    $payment_query->execute();
+    $cat_query = $db->prepare("SELECT * FROM expenses_category_assigned_to_users WHERE user_id='$user_id'");
+    $cat_query->execute();
 
-            $cat_query = "SELECT * FROM expenses_category_assigned_to_users WHERE user_id='$user_id'";
-            $cat_result = mysqli_query($connection, $cat_query);
-
-            if (isset($_POST['expense'])) {
-                $is_good = true;
-                $expense_value = $_POST['expense'];
-                if ($expense_value < 0) {
-                    $is_good = false;
-                    $_SESSION['e_expense_value'] = "Wartość musi być większa od 0!";
-                }
-
-                if (filter_var($expense_value, FILTER_VALIDATE_FLOAT) == false) {
-                    $is_good = false;
-                    $_SESSION['e_expense_value'] = "Wprowadź liczbę!";
-                }
-
-                $expense_category_assigned_to_user_id = $_POST['expense_cat'];
-                $expense_category_query = "SELECT id FROM expenses_category_assigned_to_users WHERE user_id='$user_id' AND name='$expense_category_assigned_to_user_id'";
-                $expense_category_result = mysqli_query($connection, $expense_category_query);
-                $expense_category_row = mysqli_fetch_array($expense_category_result);
-                $expense_id_cat = $expense_category_row['id'];
-
-                $payment_methods_assigned_to_users_id = $_POST['expense_payment'];
-                $payment_methods_query = "SELECT id FROM payment_methods_assigned_to_users WHERE user_id='$user_id' AND name='$payment_methods_assigned_to_users_id'";
-                $payment_methods_result = mysqli_query($connection, $payment_methods_query);
-                $payment_methods_row = mysqli_fetch_array($payment_methods_result);
-                $payment_id_cat = $payment_methods_row['id'];
-
-                $amount = $_POST['expense'];
-                $date_of_expense = $_POST['input_date'];
-                $expense_comment = $_POST['expense_comment'];
-
-                if ($connection->query("INSERT INTO expenses VALUES (NULL, '$user_id', '$expense_id_cat', '$payment_id_cat', '$amount', '$date_of_expense', '$expense_comment')")) {
-                    $_SESSION['successful_submit'] = true;
-                } else {
-                    echo " Nie udało się!";
-
-                    throw new Exception($connection->error);
-                }
-            }
-            $connection->close();
+    if (isset($_POST['expense'])) {
+        $is_good = true;
+        $expense_value = $_POST['expense'];
+        if ($expense_value < 0) {
+            $is_good = false;
+            $_SESSION['e_expense_value'] = "Wartość musi być większa od 0!";
         }
-    } catch (Exception $e) {
-        echo '<span style="color:red;">Błąd serwera! Spróbuj ponownie za chwilę.</span>';
-        echo '<br/>Informacja developerska: ' . $e;
+
+        if (filter_var($expense_value, FILTER_VALIDATE_FLOAT) == false) {
+            $is_good = false;
+            $_SESSION['e_expense_value'] = "Wprowadź liczbę!";
+        }
+        $expense_category = $_POST['expense_cat'];
+        $expense_category_query = $db->prepare("SELECT id FROM expenses_category_assigned_to_users WHERE user_id='$user_id' AND name='$expense_category'");
+        $expense_category_query->execute();
+        $expense_category_result = $expense_category_query->fetch(PDO::FETCH_ASSOC);
+        $expense_id_cat = $expense_category_result['id'];
+
+        $payment_method = $_POST['expense_payment'];
+        $payment_methods_query = $db->prepare("SELECT id FROM payment_methods_assigned_to_users WHERE user_id='$user_id' AND name='$payment_method'");
+        $payment_methods_query->execute();
+        $payment_methods_result = $payment_methods_query->fetch(PDO::FETCH_ASSOC);
+        $payment_id_cat = $payment_methods_result['id'];
+
+        $amount = $_POST['expense'];
+        $date_of_expense = $_POST['input_date'];
+        $expense_comment = $_POST['expense_comment'];
+
+        $statement = $db->prepare("INSERT INTO expenses VALUES (NULL, '$user_id', '$expense_id_cat', '$payment_id_cat', '$amount', '$date_of_expense', '$expense_comment')");
+        if ($statement->execute()) {
+            $_SESSION['successful_submit'] = true;
+        } else {
+            echo " Nie udało się!";
+        }
     }
 }
 ?>
@@ -76,7 +61,7 @@ if (!isset($_SESSION['logged'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <link rel="stylesheet" href="my_styles.css">
+
 </head>
 
 <body>
@@ -132,12 +117,12 @@ if (!isset($_SESSION['logged'])) {
                 </div>
             </div>
         </div>
-        <div class="budget_panel p-2 d-flex justify-content-center ">
-            <div class="row col-10 col-sm-10 col-md-8 col-lg-6 col-xlg=6 m-0 p-0  border rounded-3 bg-light text-dark">
+        <div class="budget_panel p-2 d-flex justify-content-center">
+            <div class=" row col-10 col-sm-10 col-md-8 col-lg-6 col-xlg=6 m-0 p-0 border rounded-3 bg-light text-dark">
                 <form method="post">
                     <?php
                     if (isset($_SESSION['successful_submit'])) {
-                        echo "<div id='hide' class='row col-3 p-2 mx-auto my-2 rounded-pill alert alert-success text-center col-3 justify-content-center center' role='alert'> Wydatek został poprawnie dodany!</div>";
+                        echo "<div id='hide_message' class='row col-9 p-2 mx-auto my-2 rounded-pill alert alert-success text-center col-3 justify-content-center center' role='alert'> Wydatek został poprawnie dodany!</div>";
                         unset($_SESSION['successful_submit']);
                     }
                     ?>
@@ -158,17 +143,21 @@ if (!isset($_SESSION['logged'])) {
                     <div class="row w-75 mx-auto my-2">
                         <label for="expense_payment"></label>
                         <select name="expense_payment" id="expense_payment" class="rounded-pill">
-                            <?php while ($row = mysqli_fetch_array($payment_result)) :; ?>
-                                <option value="<?php echo $row['name']; ?>"><?php echo $row['name']; ?></option>
-                            <?php endwhile; ?>
+                            <option disabled selected>Wybierz metodę płatności</option>
+                            <?php
+                            while ($payment_result = $payment_query->fetch(PDO::FETCH_ASSOC)) {
+                                echo "<option value='" . $payment_result['name'] . "''>" . $payment_result['name'] . "</option>";
+                            } ?>
                         </select>
                     </div>
                     <div class="row w-75 mx-auto my-2">
                         <label for="expense_cat"></label>
                         <select name="expense_cat" id="expense_cat" class="rounded-pill">
-                            <?php while ($row = mysqli_fetch_array($cat_result)) :; ?>
-                                <option value="<?php echo $row['name']; ?>"><?php echo $row['name']; ?></option>
-                            <?php endwhile; ?>
+                            <option disabled selected>Wybierz kategorię płatności</option>
+                            <?php
+                            while ($cat_results = $cat_query->fetch(PDO::FETCH_ASSOC)) {
+                                echo "<option value='" . $cat_results['name'] . "''>" . $cat_results['name'] . "</option>";
+                            } ?>
                         </select>
                     </div>
                     <div class="row w-75 mx-auto my-2">
@@ -202,7 +191,6 @@ if (!isset($_SESSION['logged'])) {
                 }
                 setInterval("hide();", 3000);
             </script>
-
         </div>
 
         <footer class="page-footer fixed-bottom text-center bg-dark text-white">2022 &#169; Adrian Żuchowski</footer>
