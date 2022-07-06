@@ -8,8 +8,8 @@ if (!isset($_SESSION['logged'])) {
     $user_id = $_SESSION['id'];
     require_once "database.php";
 
-    $begin_date = date('Y-m-d', strtotime("first day of last month"));
-    $end_date = date('Y-m-d', strtotime("last day of last month"));
+    $begin_date = date('Y-m-d', strtotime("first day of this month"));
+    $end_date = date('Y-m-d', strtotime("last day of this month"));
 
     $get_income_data = $db->prepare("SELECT SUM(amount) AS incomes FROM incomes WHERE user_id='$user_id' and date_of_income between '$begin_date' and '$end_date'");
     $get_income_data->execute();
@@ -20,7 +20,13 @@ if (!isset($_SESSION['logged'])) {
     $expense_row = $get_expense_data->fetch(PDO::FETCH_ASSOC);
 
     $month_balance = $income_row['incomes'] - $expense_row['expenses'];
+
+    $dataPoints = array(
+        array("label" => "Incomes", "y" => $income_row['incomes']),
+        array("label" => "Expenses", "y" => $expense_row['expenses']),
+    );
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -33,6 +39,32 @@ if (!isset($_SESSION['logged'])) {
     <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="my_styles.css">
+    <script>
+        window.onload = function() {
+
+            var chart = new CanvasJS.Chart("chartContainer", {
+                theme: "light2",
+                animationEnabled: true,
+                title: {
+                    text: "Twój bilans z bieżącego miesiąca:"
+                },
+                data: [{
+                    type: "pie",
+                    indexLabel: "{y}",
+                    yValueFormatString: "#,##0.00\"zł\"",
+                    indexLabelPlacement: "inside",
+                    indexLabelFontColor: "#36454F",
+                    indexLabelFontSize: 18,
+                    indexLabelFontWeight: "bolder",
+                    showInLegend: true,
+                    legendText: "{label}",
+                    dataPoints: <?php echo json_encode($dataPoints, JSON_NUMERIC_CHECK); ?>
+                }]
+            });
+            chart.render();
+
+        }
+    </script>
 </head>
 
 <body>
@@ -91,22 +123,33 @@ if (!isset($_SESSION['logged'])) {
     </div>
 
     <div class="budget_panel p-2 d-flex justify-content-center">
-        <div class="row col-10 col-sm-10 col-md-8 col-lg-6 col-xlg=6 m-0 p-0 border rounded-3 bg-light text-dark">
-            <p class="mx-auto">Twój bilans z bieżącego miesiąca:</p>
-            <p><?php echo "Income: " . $income_row['incomes'];
-                ?></p>
-            <p><?php echo "Expense: " . $expense_row['expenses'];
-                ?></p>
-            <p <?php if ($month_balance < 0) {
-                    echo 'class= "text-danger"';
-                } else {
-                    echo 'class= "text-success"';
-                } ?>><?php echo "Total: " . $month_balance;
-                        ?></p>
-        </div>
+        <div id="chartContainer" style="height: 370px; width: 100%;" cclass="p-0"></div>
     </div>
+    <h3 <?php if ($month_balance < 0) {
+            echo 'class= "text-center text-danger mt-3"';
+        } else {
+            echo 'class= "text-center text-success mt-3"';
+        } ?>><?php echo "Total: " . $month_balance . " zł";
+                ?></h3>
+
+    <h4 class="text-center"><?php if ($month_balance > 5000) {
+                                echo 'Brawo! Świetnie zarządzasz swoim budżetem!';
+                            } elseif ($month_balance <= 5000 && $month_balance > 2000) {
+                                echo 'Brawo! Dobrze sobie radzisz, wychodzisz na plus';
+                            } elseif ($month_balance <= 2000 && $month_balance > 0) {
+                                echo 'Brawo! Oszczędzasz!';
+                            } elseif ($month_balance == 0 && $income_row['incomes'] == 0) {
+                                echo 'Brak danych!';
+                            } elseif ($month_balance == 0) {
+                                echo 'Twoje wydatki i przychody się zrównały!';
+                            } elseif ($month_balance < 0) {
+                                echo 'Uwaga! Zacznij pilnować wydatków!';
+                            } ?></h4>
+
 
     <footer class="page-footer fixed-bottom text-center bg-dark text-white">2022 &#169; Adrian Żuchowski</footer>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
