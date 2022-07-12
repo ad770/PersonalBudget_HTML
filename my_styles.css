@@ -1,13 +1,62 @@
-		.error {
-			color: red;
-			margin-top: 5px;
-			margin-bottom: 5px;
-		}
+body {
+	background-image: url('wallpaper.jpg');
+	background-attachment: fixed;
+	background-size: cover;
+	background-position: 14% 84%;
+}
 
-		.hidden {
-			display: none;
-		}
+.active {
+	background-color: #cfccc0;
+	color: green;
+}
 
-		.show {
-			display: : block;
-		}
+.error {
+	color: red;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.hidden {
+	visibility: hidden;
+	/* display: none; */
+}
+
+.show {
+	visibility: visible;
+	/* display: contents; */
+}
+
+#wrapper h3,
+h2 {
+	background-color: RGBa(229, 226, 217, 0.8);
+}
+
+#table_detail {
+	text-align: center;
+	border-collapse: collapse;
+	background-color: #ffffffe5;
+	color: #2E2E2E;
+	border: #A4A4A4;
+}
+
+#table_detail thead tr:hover {
+	background-color: unset;
+}
+
+#table_detail tr.hidden_tr {
+	text-align: left;
+	background-color: #ccccce;
+}
+
+#table_detail tr:hover {
+	background-color: #f2f2f2;
+}
+
+#table_detail tr.hidden_tr:hover {
+	text-align: left;
+	background-color: #cad3dd;
+}
+
+#table_detail .hidden_row {
+	display: none;
+}
