@@ -61,7 +61,7 @@ if (!isset($_SESSION['logged'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-
+    <link rel="stylesheet" href="my_styles.css">
 </head>
 
 <body>
@@ -101,8 +101,8 @@ if (!isset($_SESSION['logged'])) {
                                     <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
                                 </svg> Dodaj przychód</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="expense.php"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-cart-dash" viewBox="0 0 15 15">
+                        <li class="nav-item active">
+                            <a class="nav-link disabled" href="expense.php"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-cart-dash" viewBox="0 0 15 15">
                                     <path d="M6.5 7a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4z" />
                                     <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
                                 </svg> Dodaj wydatek</a>
@@ -118,7 +118,7 @@ if (!isset($_SESSION['logged'])) {
             </div>
         </div>
         <div class="budget_panel p-2 d-flex justify-content-center">
-            <div class=" row col-10 col-sm-10 col-md-8 col-lg-6 col-xlg=6 m-0 p-0 border rounded-3 bg-light text-dark">
+            <div class=" row col-10 col-sm-10 col-md-8 col-lg-6 col-xlg=6 m-0 p-0 border rounded-3 text-dark">
                 <form method="post">
                     <?php
                     if (isset($_SESSION['successful_submit'])) {
