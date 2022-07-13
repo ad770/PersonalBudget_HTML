@@ -20,11 +20,6 @@ if (!isset($_SESSION['logged'])) {
     $expense_row = $get_expense_data->fetch(PDO::FETCH_ASSOC);
 
     $month_balance = $income_row['incomes'] - $expense_row['expenses'];
-
-    $dataPoints = array(
-        array("label" => "Incomes", "y" => $income_row['incomes']),
-        array("label" => "Expenses", "y" => $expense_row['expenses']),
-    );
 }
 
 ?>
@@ -39,32 +34,7 @@ if (!isset($_SESSION['logged'])) {
     <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="my_styles.css">
-    <script>
-        window.onload = function() {
-
-            var chart = new CanvasJS.Chart("chartContainer", {
-                theme: "light2",
-                animationEnabled: true,
-                title: {
-                    text: "Twój bilans z bieżącego miesiąca:"
-                },
-                data: [{
-                    type: "pie",
-                    indexLabel: "{y}",
-                    yValueFormatString: "#,##0.00\"zł\"",
-                    indexLabelPlacement: "inside",
-                    indexLabelFontColor: "#36454F",
-                    indexLabelFontSize: 18,
-                    indexLabelFontWeight: "bolder",
-                    showInLegend: true,
-                    legendText: "{label}",
-                    dataPoints: <?php echo json_encode($dataPoints, JSON_NUMERIC_CHECK); ?>
-                }]
-            });
-            chart.render();
-
-        }
-    </script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 
 <body>
@@ -92,8 +62,8 @@ if (!isset($_SESSION['logged'])) {
             <div class="row">
                 <div class="col-10 col-sm-10 col-md-8 col-lg-7 mx-auto">
                     <ul class="nav nav-tabs nav-justified text-center">
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="main.php"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-house" viewBox="0 0 15 15">
+                        <li class="nav-item active">
+                            <a class="nav-link disabled" aria-current="page" href="main.php"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-house" viewBox="0 0 15 15">
                                     <path fill-rule="evenodd" d="M2 13.5V7h1v6.5a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5V7h1v6.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5zm11-11V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
                                     <path fill-rule="evenodd" d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
                                 </svg> Home</a>
@@ -121,35 +91,75 @@ if (!isset($_SESSION['logged'])) {
             </div>
         </div>
     </div>
-
-    <div class="budget_panel p-2 d-flex justify-content-center">
-        <div id="chartContainer" style="height: 370px; width: 100%;" cclass="p-0"></div>
+    <div class="row text-center">
+        <h2>Twój bilans z obecnego miesiąca:</h2>
     </div>
-    <h3 <?php if ($month_balance < 0) {
-            echo 'class= "text-center text-danger mt-3"';
-        } else {
-            echo 'class= "text-center text-success mt-3"';
-        } ?>><?php echo "Total: " . $month_balance . " zł";
-                ?></h3>
+    <div>
+        <h3 <?php if ($month_balance < 0) {
+                echo 'class="text-center text-danger mt-3"';
+            } else {
+                echo 'class="text-center text-success mt-3"';
+            } ?>><?php echo "Total: " . $month_balance . " zł";
+                    ?></h3>
 
-    <h4 class="text-center"><?php if ($month_balance > 5000) {
-                                echo 'Brawo! Świetnie zarządzasz swoim budżetem!';
-                            } elseif ($month_balance <= 5000 && $month_balance > 2000) {
-                                echo 'Brawo! Dobrze sobie radzisz, wychodzisz na plus';
-                            } elseif ($month_balance <= 2000 && $month_balance > 0) {
-                                echo 'Brawo! Oszczędzasz!';
-                            } elseif ($month_balance == 0 && $income_row['incomes'] == 0) {
-                                echo 'Brak danych!';
-                            } elseif ($month_balance == 0) {
-                                echo 'Twoje wydatki i przychody się zrównały!';
-                            } elseif ($month_balance < 0) {
-                                echo 'Uwaga! Zacznij pilnować wydatków!';
-                            } ?></h4>
+        <h4 class="text-center"><?php if ($month_balance > 5000) {
+                                    echo 'Brawo! Świetnie zarządzasz swoim budżetem!';
+                                } elseif ($month_balance <= 5000 && $month_balance > 2000) {
+                                    echo 'Brawo! Dobrze sobie radzisz, wychodzisz na plus';
+                                } elseif ($month_balance <= 2000 && $month_balance > 0) {
+                                    echo 'Brawo! Oszczędzasz!';
+                                } elseif ($month_balance == 0 && $income_row['incomes'] == 0) {
+                                    echo 'Brak danych!';
+                                } elseif ($month_balance == 0) {
+                                    echo 'Twoje wydatki i przychody się zrównały!';
+                                } elseif ($month_balance < 0) {
+                                    echo 'Uwaga! Zacznij pilnować wydatków!';
+                                } ?></h4>
 
+    </div>
 
+    <!-- Wykresy -->
+    <div class="row text-center">
+        <table class="charts ">
+            <tr>
+                <div id="balance_chart" style=" height:500px;"></div>
+            </tr>
+        </table>
+    </div>
+    <!-- /-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/- -->
     <footer class="page-footer fixed-bottom text-center bg-dark text-white">2022 &#169; Adrian Żuchowski</footer>
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {
+            'packages': ['corechart']
+        });
+        google.charts.setOnLoadCallback(draw_chart);
 
+        function draw_chart() {
+            let data = google.visualization.arrayToDataTable([
+                ['Type', 'Amount', {
+                    role: 'annotation'
+                }],
+                ['Incomes', <?php echo $income_row['incomes']; ?>, <?php echo ("'" .  $income_row['incomes'] . "'"); ?>],
+                ['Expenses', <?php echo $expense_row['expenses']; ?>, <?php echo ("'" .  $expense_row['expenses'] . "'"); ?>]
+            ]);
+
+            let options = {
+                legend: {
+                    position: 'top',
+                    alignment: 'center'
+                },
+                is3D: true,
+                hAxis: {
+                    textPosition: 'none'
+                },
+                backgroundColor: 'transparent'
+            };
+
+            let balance_chart = new google.visualization.PieChart(document.getElementById('balance_chart'));
+            balance_chart.draw(data, options);
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
