@@ -15,7 +15,7 @@ if (!isset($_SESSION['logged'])) {
     $end_of_previous_month = date('Y-m-d', strtotime("last day of last month"));
     $begin_of_current_year = date('Y-m-d', strtotime("first day of january"));
     $end_of_current_year = date('Y-m-d', strtotime("last day of december"));
-    $today = date('d-m-Y');
+    $today = date('Y-m-d');
 }
 ?>
 
@@ -103,17 +103,18 @@ if (!isset($_SESSION['logged'])) {
                                                                 echo 'selected= "selected"';
                                                             } ?>>Niestandardowy</option>
                             </select>
-                            <div class="hidden" id="choose_date" onChange="form.submit()">
+                            <div id="choose_date">
                                 <div class="input-group justify-content-between">
                                     <div class=" col-10 col-sm-8 col-md-6 col-lg-5 mx-2 my-2 d-flex flex-column align-self-center">
                                         <label for="begin_date">Data początkowa</label>
-                                        <input type="date" class="rounded-pill p-1 text-center" name="begin_date" id="begin_date">
+                                        <input type="date" class="rounded-pill p-1 text-center" name="begin_date" id="begin_date" onChange="form.submit()">
                                     </div>
                                     <div class=" col-10 col-sm-8 col-md-6 col-lg-5 mx-2 my-2 d-flex flex-column align-self-center">
                                         <label for="end_date">Data końcowa</label>
-                                        <input type="date" class="rounded-pill p-1 text-center" name="end_date" id="end_date">
+                                        <input type="date" class="rounded-pill p-1 text-center" name="end_date" id="end_date" onChange="form.submit()">
                                     </div>
                                 </div>
+
                             </div>
                             <?php
                             if (isset($_POST['balance'])) {
@@ -140,6 +141,7 @@ if (!isset($_SESSION['logged'])) {
                                 case "undenify":
                                     $begin_date = $_POST['begin_date'];
                                     $end_date = $_POST['end_date'];
+
                                     break;
                                 default:
                                     break;
@@ -151,17 +153,17 @@ if (!isset($_SESSION['logged'])) {
                     <div class="row d-flex flex-wrap">
                         <?php
                         ?>
-                        <table class="charts ">
+                        <table class="charts text-center">
                             <tr>
-                                <div id="income_chart" class="col-10 col-md-6 mx-auto" style=" height:500px;"></div>
-                                <div id="expense_chart" class="col-10 col-md-6 mx-auto" style=" height:500px;"></div>
+                                <div id="income_chart" class="col-10 col-md-6 mx-auto" style=" height:30em;"></div>
+                                <div id="expense_chart" class="col-10 col-md-6 mx-auto" style=" height:30em;"></div>
                             </tr>
                         </table>
                     </div>
                     <!-- /-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/- -->
 
                     <div id="wrapper" class="show_balance">
-                        <div class="row text-center col-3 mx-auto">
+                        <div class="row text-center col-4 mx-auto">
                             <!-- Wartość TOTAL z danego okresu rozliczeniowego -->
                             <?php
                             $get_income_data = $db->prepare("SELECT SUM(amount) AS incomes FROM incomes WHERE user_id='$user_id' and date_of_income between '$begin_date' and '$end_date'");
@@ -181,8 +183,7 @@ if (!isset($_SESSION['logged'])) {
                                 } ?>><?php echo "Total: " . $month_balance . " zł";
                                         ?></h3>
                             <!-- /-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/- -->
-
-                            <!-- Tabele trasankcji SQL -->
+                            <!-- Tabele z historią trasankcji SQL -->
                             <h2 class="mt-4 w-30">Historia transakcji</h2>
                         </div>
                         <div class="row text-center">
@@ -298,7 +299,6 @@ if (!isset($_SESSION['logged'])) {
                 <?php
                 $get_income_data_to_chart = $db->prepare("SELECT SUM(amount) AS income_sum_amount, income_category_assigned_to_user_id AS income_cat_id FROM incomes WHERE user_id='$user_id' and date_of_income between '$begin_date' and '$end_date' GROUP BY income_category_assigned_to_user_id");
                 $get_income_data_to_chart->execute();
-
                 while ($income_to_chart_result = $get_income_data_to_chart->fetch(PDO::FETCH_ASSOC)) {
                     $income_category_id_to_chart = $income_to_chart_result['income_cat_id'];
                     $get_income_cat_to_chart = $db->prepare("SELECT name FROM incomes_category_assigned_to_users WHERE id=$income_category_id_to_chart");
@@ -311,7 +311,7 @@ if (!isset($_SESSION['logged'])) {
 
             let income_options = {
                 title: 'Analiza przychodów',
-                titlePosition: 'in',
+                titlePosition: 'out',
                 legend: {
                     position: 'none',
                 },
@@ -347,10 +347,10 @@ if (!isset($_SESSION['logged'])) {
                 ?>
             ]);
 
-
             let expense_options = {
+
                 title: 'Analiza wydatków',
-                titlePosition: 'in',
+                titlePosition: 'out',
                 legend: {
                     position: 'none',
                 },
@@ -366,22 +366,21 @@ if (!isset($_SESSION['logged'])) {
         }
     </script>
     <script>
-        document.getElementById('begin_date').value = <?php if (isset($_POST['begin_date'])) echo $_POST['begin_date'];
-                                                        else echo $begin_date; ?>;
-        document.getElementById('end_date').value = <?php if (isset($_POST['end_date'])) echo $_POST['end_date'];
-                                                    else echo $end_date; ?>;
-    </script>
-    <script>
-        $('#time_option').change(function() {
-            event.stopPropagation();
-
-            if ($(this).val() == "undenify") {
-                $('#choose_date').removeClass("hidden");
+        // Skrypt, który ma za zadanie pokazać div'a z wkyborem daty jedynie przy wybranej funkcji 'Niestandardowy'
+        // Niestety nie działa.
+        $("#time_option").change(function() {
+            if ($(this).val() != "undenify") {
+                $('#choose_date').hide();
             } else {
-                $('#choose_date').removeClass("show");
+                $('#choose_date').show();
             }
         });
     </script>
+    <script>
+        document.getElementById('begin_date').value = <?php echo "'" . $begin_date . "'"; ?>;
+        document.getElementById('end_date').value = <?php echo "'" . $end_date . "'"; ?>;
+    </script>
+
     <script>
         $(function() {
             $("td[colspan=2]").find("p").hide();
@@ -396,7 +395,6 @@ if (!isset($_SESSION['logged'])) {
             });
         });
     </script>
-    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
