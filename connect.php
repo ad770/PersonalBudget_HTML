@@ -1,7 +1,7 @@
 <?php
 return [
-	'host' => 'localhost',
-	'user' => 'root',
-	'password' => '',
-	'database' => 'personalbudget'
+	'host' => 'budget.adrian-zuchowski.profesjonalnyprogramista.pl.mysql.dhosting.pl',
+	'user' => 'aojoh9_budgetad',
+	'password' => 'ohrahshu1She',
+	'database' => 'geich3_budgetad'
 ];
