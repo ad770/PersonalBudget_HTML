@@ -206,7 +206,7 @@ if (!isset($_SESSION['logged'])) {
                                             $get_income_cat->execute();
                                             $income_cat_result = $get_income_cat->fetch(PDO::FETCH_ASSOC);
                                         ?>
-                                            <tr>
+                                            <tr id="main_table_row">
                                                 <?php
                                                 echo "<td>" . $income_result['amount'] . "</td>";
                                                 echo "<td>" . $income_result['date_of_income'] . "</td>";
@@ -293,7 +293,7 @@ if (!isset($_SESSION['logged'])) {
 
         function draw_income_chart() {
             let income_data = google.visualization.arrayToDataTable([
-                ['Income category', 'Income amount', {
+                ['Kategoria przychodów', 'Suma przychodów', {
                     role: 'annotation'
                 }],
                 <?php
@@ -328,7 +328,7 @@ if (!isset($_SESSION['logged'])) {
 
         function draw_expense_chart() {
             let expense_data = google.visualization.arrayToDataTable([
-                ['Expense category', 'Expense amount', {
+                ['Kategoria wydatków', 'Suma wydatków', {
                     role: 'annotation'
                 }, {
                     role: 'style'

@@ -105,7 +105,7 @@ if (!isset($_SESSION['logged'])) {
         <h4 class="text-center"><?php if ($month_balance > 5000) {
                                     echo 'Brawo! Świetnie zarządzasz swoim budżetem!';
                                 } elseif ($month_balance <= 5000 && $month_balance > 2000) {
-                                    echo 'Brawo! Dobrze sobie radzisz, wychodzisz na plus';
+                                    echo 'Brawo! Dobrze sobie radzisz, wychodzisz na plus!';
                                 } elseif ($month_balance <= 2000 && $month_balance > 0) {
                                     echo 'Brawo! Oszczędzasz!';
                                 } elseif ($month_balance == 0 && $income_row['incomes'] == 0) {
@@ -118,11 +118,11 @@ if (!isset($_SESSION['logged'])) {
 
     </div>
 
-    <!-- Wykresy -->
+    <!-- Wykres -->
     <div class="row text-center">
-        <table class="charts ">
+        <table class="charts">
             <tr>
-                <div id="balance_chart" style=" height:500px;"></div>
+                <div id="balance_chart" style=" height:40em;"></div>
             </tr>
         </table>
     </div>
@@ -137,11 +137,11 @@ if (!isset($_SESSION['logged'])) {
 
         function draw_chart() {
             let data = google.visualization.arrayToDataTable([
-                ['Type', 'Amount', {
+                ['Typ', 'Wartość', {
                     role: 'annotation'
                 }],
-                ['Incomes', <?php echo $income_row['incomes']; ?>, <?php echo ("'" .  $income_row['incomes'] . "'"); ?>],
-                ['Expenses', <?php echo $expense_row['expenses']; ?>, <?php echo ("'" .  $expense_row['expenses'] . "'"); ?>]
+                ['Przychód', <?php echo $income_row['incomes']; ?>, <?php echo ("'" .  $income_row['incomes'] . "'"); ?>],
+                ['Wydatek', <?php echo $expense_row['expenses']; ?>, <?php echo ("'" .  $expense_row['expenses'] . "'"); ?>]
             ]);
 
             let options = {
@@ -150,6 +150,7 @@ if (!isset($_SESSION['logged'])) {
                     alignment: 'center'
                 },
                 is3D: true,
+                pieSliceText: 'value',
                 hAxis: {
                     textPosition: 'none'
                 },
